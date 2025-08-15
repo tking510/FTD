@@ -1,0 +1,2801 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポイント交換プラットフォーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-bottom: 3px solid #ffd700;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(255, 215, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+            border: 2px solid #ffd700;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 0.25rem;
+            margin-bottom: 2rem;
+            border: 2px solid #ffd700;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .card-header {
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h3 {
+            color: #333;
+            font-size: 1.25rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background-color: #fffbf0;
+        }
+
+        .payment-method {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-method.active {
+            border-color: #ffd700;
+            background: #fffbf0;
+        }
+
+        .payment-method-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-method-header h4 {
+            color: #333;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #ffd700;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .file-upload {
+            border: 2px dashed #ffd700;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-upload:hover {
+            background-color: #fffbf0;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d1edff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .crypto-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-mode-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            z-index: 1000;
+        }
+
+        .copy-btn {
+            background: none;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .copy-btn:hover {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto;
+            padding: 2rem;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-tab {
+                margin-bottom: 0.25rem;
+            }
+
+            .table {
+                font-size: 0.875rem;
+            }
+
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="user-mode-indicator" id="modeIndicator">管理モード</div>
+
+    <!-- ログイン画面 -->
+    <div id="loginSection">
+        <div class="login-container">
+            <div class="login-form">
+                <h2>ポイント交換プラットフォーム</h2>
+                <div class="form-group">
+                    <label for="username">ユーザー名</label>
+                    <input type="text" id="username" placeholder="admin">
+                </div>
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" placeholder="admin123">
+                </div>
+                <button class="btn btn-full" onclick="login()">ログイン</button>
+                <div id="loginError" class="alert alert-error" style="display: none; margin-top: 1rem;">
+                    ユーザー名またはパスワードが正しくありません。
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理画面 -->
+    <div id="adminSection" style="display: none;">
+        <div class="header">
+            <h1>ポイント交換プラットフォーム</h1>
+            <div class="header-info">
+                1円 = 1PT | 最低購入: 2,000円 | 最低換金: 4,000円
+                <button class="btn" style="margin-left: 1rem;" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('dashboard')">ダッシュボード</button>
+                <button class="nav-tab" onclick="showTab('users')">ユーザー管理</button>
+                <button class="nav-tab" onclick="showTab('applications')">申請管理</button>
+                <button class="nav-tab" onclick="showTab('payment-settings')">決済設定</button>
+                <button class="nav-tab" onclick="showTab('notifications')">通知設定</button>
+                <button class="nav-tab" onclick="showTab('user-history')">ユーザー履歴</button>
+            </div>
+
+            <!-- ダッシュボード -->
+            <div id="dashboard" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>システム概要</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="text-align: center; padding: 1rem; background: #fffbf0; border-radius: 10px;">
+                            <h4>総ユーザー数</h4>
+                            <p style="font-size: 2rem; color: #ffd700; font-weight: bold;" id="totalUsers">0</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f0fff4; border-radius: 10px;">
+                            <h4>今日の購入申請</h4>
+                            <p style="font-size: 2rem; color: #28a745; font-weight: bold;" id="todayPurchase">0</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #f0f8ff; border-radius: 10px;">
+                            <h4>今日の換金申請</h4>
+                            <p style="font-size: 2rem; color: #007bff; font-weight: bold;" id="todayCashout">0</p>
+                        </div>
+                        <div style="text-align: center; padding: 1rem; background: #fff0f5; border-radius: 10px;">
+                            <h4>総取引額</h4>
+                            <p style="font-size: 2rem; color: #dc3545; font-weight: bold;" id="totalAmount">¥0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>決済方法別割合</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4>購入決済割合</h4>
+                            <canvas id="purchasePaymentChart" width="300" height="300"></canvas>
+                            <div id="purchasePaymentLegend" style="margin-top: 1rem;"></div>
+                        </div>
+                        <div>
+                            <h4>換金決済割合</h4>
+                            <canvas id="cashoutPaymentChart" width="300" height="300"></canvas>
+                            <div id="cashoutPaymentLegend" style="margin-top: 1rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>取引推移</h3>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn" onclick="updateChart('daily')" id="dailyBtn">日別</button>
+                            <button class="btn" onclick="updateChart('monthly')" id="monthlyBtn">月別</button>
+                        </div>
+                    </div>
+                    <canvas id="transactionChart" width="800" height="400"></canvas>
+                    <div id="transactionData" style="margin-top: 1rem; max-height: 200px; overflow-y: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 0.5rem; border: 1px solid #ddd;">日付</th>
+                                    <th style="padding: 0.5rem; border: 1px solid #ddd;">購入額</th>
+                                    <th style="padding: 0.5rem; border: 1px solid #ddd;">換金額</th>
+                                    <th style="padding: 0.5rem; border: 1px solid #ddd;">純額</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ユーザー管理 -->
+            <div id="users" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ユーザー作成</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4>個別作成</h4>
+                            <div class="form-group">
+                                <label>ユーザー名</label>
+                                <input type="text" id="newUsername" placeholder="ユーザー名を入力">
+                            </div>
+                            <div class="form-group">
+                                <label>パスワード</label>
+                                <input type="text" id="newPassword" placeholder="パスワードを入力">
+                            </div>
+                            <div class="form-group">
+                                <label>初期ポイント</label>
+                                <input type="number" id="newPoints" placeholder="0" value="0">
+                            </div>
+                            <button class="btn btn-full" onclick="createUser()">ユーザー作成</button>
+                        </div>
+                        <div>
+                            <h4>CSV一括作成</h4>
+                            <div class="file-upload" onclick="document.getElementById('csvFile').click()">
+                                <input type="file" id="csvFile" accept=".csv" onchange="handleCSVUpload(event)">
+                                <p>CSVファイルをアップロード</p>
+                                <small>フォーマット: username,password,points</small>
+                            </div>
+                            <button class="btn btn-full" onclick="processBulkUsers()" id="processBulkBtn" style="display: none;">一括作成実行</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ユーザー一覧</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ユーザー名</th>
+                                <th>ポイント残高</th>
+                                <th>登録日</th>
+                                <th>決済情報</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersList">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 申請管理 -->
+            <div id="applications" class="tab-content">
+                <div class="nav-tabs" style="margin-bottom: 1rem;">
+                    <button class="nav-tab active" onclick="showApplicationTab('purchase')">購入申請</button>
+                    <button class="nav-tab" onclick="showApplicationTab('cashout')">換金申請</button>
+                </div>
+
+                <div id="purchaseApplications" class="application-tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>購入申請一覧</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ユーザー</th>
+                                    <th>金額</th>
+                                    <th>決済方法</th>
+                                    <th>ステータス</th>
+                                    <th>申請日</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchaseApplicationsList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="cashoutApplications" class="application-tab-content" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>換金申請一覧</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ユーザー</th>
+                                    <th>ポイント</th>
+                                    <th>金額</th>
+                                    <th>出金先</th>
+                                    <th>ステータス</th>
+                                    <th>申請日</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cashoutApplicationsList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 決済設定 -->
+            <div id="payment-settings" class="tab-content">
+                <!-- PayPay設定 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>PayPay設定</h3>
+                    </div>
+                    <div class="payment-method">
+                        <div class="payment-method-header">
+                            <h4>PayPay決済</h4>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="paypayEnabled" onchange="togglePaymentMethod('paypay')" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div id="paypaySettings">
+                            <div class="form-group">
+                                <label>PayPay ID</label>
+                                <input type="text" id="paypayId" placeholder="PayPay IDを入力">
+                                <button class="copy-btn" onclick="copyText('paypayId')">コピー</button>
+                            </div>
+                            <div class="form-group">
+                                <label>QRコード</label>
+                                <div class="file-upload" onclick="document.getElementById('paypayQR').click()">
+                                    <input type="file" id="paypayQR" accept="image/*" onchange="uploadQR('paypay', event)">
+                                    <p>QRコードをアップロード</p>
+                                    <img id="paypayQRPreview" style="max-width: 200px; display: none;">
+                                </div>
+                            </div>
+                            <button class="btn" onclick="savePaymentSettings('paypay')">保存</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 仮想通貨設定 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>仮想通貨設定</h3>
+                        <button class="btn" onclick="addCryptoModal()">通貨追加</button>
+                    </div>
+                    <div id="cryptoList">
+                    </div>
+                </div>
+
+                <!-- 銀行振込設定 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>銀行振込設定</h3>
+                    </div>
+                    <div class="payment-method">
+                        <div class="payment-method-header">
+                            <h4>銀行振込</h4>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="bankEnabled" onchange="togglePaymentMethod('bank')" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div id="bankSettings">
+                            <div class="form-group">
+                                <label>銀行名</label>
+                                <input type="text" id="bankName" placeholder="銀行名を入力">
+                            </div>
+                            <div class="form-group">
+                                <label>支店名</label>
+                                <input type="text" id="branchName" placeholder="支店名を入力">
+                            </div>
+                            <div class="form-group">
+                                <label>口座種別</label>
+                                <select id="accountType">
+                                    <option value="普通">普通</option>
+                                    <option value="当座">当座</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>口座番号</label>
+                                <input type="text" id="accountNumber" placeholder="口座番号を入力">
+                                <button class="copy-btn" onclick="copyText('accountNumber')">コピー</button>
+                            </div>
+                            <div class="form-group">
+                                <label>口座名義</label>
+                                <input type="text" id="accountHolder" placeholder="口座名義を入力">
+                            </div>
+                            <button class="btn" onclick="savePaymentSettings('bank')">保存</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- コンビニ決済設定 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>コンビニ決済設定</h3>
+                        <button class="btn" onclick="addConvenienceModal()">項目追加</button>
+                    </div>
+                    <div id="convenienceList">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 通知設定 -->
+            <div id="notifications" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Telegram通知設定</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>購入通知ボットトークン</label>
+                        <input type="text" id="purchaseBotToken" placeholder="ボットトークンを入力">
+                    </div>
+                    <div class="form-group">
+                        <label>購入通知チャットID</label>
+                        <input type="text" id="purchaseChatId" placeholder="チャットIDを入力">
+                    </div>
+                    <div class="form-group">
+                        <label>換金通知ボットトークン</label>
+                        <input type="text" id="cashoutBotToken" placeholder="ボットトークンを入力">
+                    </div>
+                    <div class="form-group">
+                        <label>換金通知チャットID</label>
+                        <input type="text" id="cashoutChatId" placeholder="チャットIDを入力">
+                    </div>
+                    <button class="btn" onclick="saveNotificationSettings()">保存</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Google Apps Script連携</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>GAS Webhook URL</label>
+                        <input type="text" id="gasWebhookUrl" placeholder="GAS WebhookのURLを入力">
+                    </div>
+                    <button class="btn" onclick="saveGASSettings()">保存</button>
+                </div>
+            
+            <!-- ユーザー履歴 -->
+            <div id="user-history" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ユーザー履歴管理</h3>
+                    </div>
+
+                    <!-- 検索・フィルター -->
+                    <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div>
+                                <label>ユーザー名検索:</label>
+                                <input type="text" id="userSearchInput" placeholder="ユーザー名を入力" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;" oninput="filterUserHistory()">
+                            </div>
+                            <div>
+                                <label>取引種別:</label>
+                                <select id="transactionTypeFilter" onchange="filterUserHistory()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                                    <option value="">全て</option>
+                                    <option value="purchase">購入</option>
+                                    <option value="cashout">換金</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>ステータス:</label>
+                                <select id="statusFilter" onchange="filterUserHistory()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                                    <option value="">全て</option>
+                                    <option value="pending">申請中</option>
+                                    <option value="processing">処理中</option>
+                                    <option value="completed">完了</option>
+                                    <option value="rejected">拒否</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label>期間:</label>
+                                <select id="periodFilter" onchange="filterUserHistory()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                                    <option value="">全期間</option>
+                                    <option value="today">今日</option>
+                                    <option value="week">1週間</option>
+                                    <option value="month">1ヶ月</option>
+                                    <option value="3months">3ヶ月</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn" onclick="exportUserHistory()">CSV出力</button>
+                            <button class="btn" onclick="refreshUserHistory()">更新</button>
+                        </div>
+                    </div>
+
+                    <!-- 履歴一覧 -->
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 100px;">日時</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 100px;">ユーザー名</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 80px;">種別</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 100px;">金額/PT</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 100px;">決済方法</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 80px;">ステータス</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 200px;">詳細情報</th>
+                                    <th style="padding: 0.8rem; border: 1px solid #ddd; min-width: 100px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userHistoryTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="historyPagination" style="text-align: center; margin-top: 1rem;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        </div>
+    </div>
+
+    <!-- ユーザー画面 -->
+    <div id="userSection" style="display: none;">
+        <div class="header">
+            <h1>ポイント交換プラットフォーム</h1>
+            <div class="header-info">
+                残高: <span id="userPoints">0</span>PT | ユーザー: <span id="currentUser"></span>
+                <button class="btn" style="margin-left: 1rem;" onclick="logout()">ログアウト</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showUserTab('purchase')">ポイント購入</button>
+                <button class="nav-tab" onclick="showUserTab('cashout')">ポイント換金</button>
+                <button class="nav-tab" onclick="showUserTab('profile')">登録情報</button>
+                <button class="nav-tab" onclick="showUserTab('history')">履歴</button>
+            </div>
+
+            <!-- ポイント購入 -->
+            <div id="userPurchase" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ポイント購入申請</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>購入金額（最低2,000円）</label>
+                        <input type="number" id="purchaseAmount" min="2000" placeholder="2000" step="100">
+                        <small>1円 = 1PT</small>
+                    </div>
+                    <div class="form-group">
+                        <label>決済方法</label>
+                        <select id="purchaseMethod" onchange="showPaymentInfo()">
+                            <option value="">選択してください</option>
+                        </select>
+                    </div>
+                    <div id="paymentInfo" style="display: none;">
+                        <div id="paymentDetails"></div>
+                        <div class="file-upload" onclick="document.getElementById('purchaseProof').click()">
+                            <input type="file" id="purchaseProof" accept="image/*" onchange="uploadProof(event)">
+                            <p>入金証明をアップロード</p>
+                            <img id="proofPreview" style="max-width: 200px; display: none;">
+                        </div>
+                        <button class="btn btn-full" onclick="submitPurchase()">購入申請</button>
+                        <button class="btn btn-success btn-full" id="completeDepositBtn" onclick="completeDeposit()" style="display: none; margin-top: 1rem;">入金完了</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ポイント換金 -->
+            <div id="userCashout" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ポイント換金申請</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>換金ポイント（最低4,000PT）</label>
+                        <input type="number" id="cashoutPoints" min="4000" placeholder="4000" step="100">
+                        <small>換金額: <span id="cashoutAmount">0</span>円</small>
+                    </div>
+                    <div class="form-group">
+                        <label>出金先</label>
+                        <select id="cashoutMethod" onchange="showCashoutInfo()">
+                            <option value="">選択してください</option>
+                        </select>
+                    </div>
+                    <div id="cashoutInfo" style="display: none;">
+                        <div id="cashoutDetails"></div>
+                        <button class="btn btn-full" onclick="submitCashout()">換金申請</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 登録情報 -->
+            <div id="userProfile" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>出金情報登録</h3>
+                    </div>
+                    <div class="nav-tabs" style="margin-bottom: 1rem;">
+                        <button class="nav-tab active" onclick="showProfileTab('bank')">銀行口座</button>
+                        <button class="nav-tab" onclick="showProfileTab('paypay')">PayPay</button>
+                        <button class="nav-tab" onclick="showProfileTab('crypto')">仮想通貨</button>
+                    </div>
+
+                    <div id="profileBank" class="profile-tab-content">
+                        <div class="form-group">
+                            <label>銀行名</label>
+                            <input type="text" id="userBankName" placeholder="銀行名を入力">
+                        </div>
+                        <div class="form-group">
+                            <label>支店名</label>
+                            <input type="text" id="userBranchName" placeholder="支店名を入力">
+                        </div>
+                        <div class="form-group">
+                            <label>口座種別</label>
+                            <select id="userAccountType">
+                                <option value="普通">普通</option>
+                                <option value="当座">当座</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>口座番号</label>
+                            <input type="text" id="userAccountNumber" placeholder="口座番号を入力">
+                        </div>
+                        <div class="form-group">
+                            <label>口座名義</label>
+                            <input type="text" id="userAccountHolder" placeholder="口座名義を入力">
+                        </div>
+                        <button class="btn" onclick="saveUserProfile('bank')">保存</button>
+                    </div>
+
+                    <div id="profilePaypay" class="profile-tab-content" style="display: none;">
+                        <div class="form-group">
+                            <label>PayPay ID</label>
+                            <input type="text" id="userPaypayId" placeholder="PayPay IDを入力">
+                        </div>
+                        <div class="form-group">
+                            <label>PayPay名義</label>
+                            <input type="text" id="userPaypayName" placeholder="PayPay名義を入力">
+                        </div>
+                        <button class="btn" onclick="saveUserProfile('paypay')">保存</button>
+                    </div>
+
+                    <div id="profileCrypto" class="profile-tab-content" style="display: none;">
+                        <div class="form-group">
+                            <label>仮想通貨</label>
+                            <select id="userCryptoType" onchange="updateCryptoForm()">
+                                <option value="">選択してください</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>ウォレットアドレス</label>
+                            <input type="text" id="userCryptoAddress" placeholder="ウォレットアドレスを入力">
+                        </div>
+                        <div class="form-group" id="cryptoTagGroup" style="display: none;">
+                            <label>タグ/メモ</label>
+                            <input type="text" id="userCryptoTag" placeholder="タグ/メモを入力（必要な場合）">
+                        </div>
+                        <button class="btn" onclick="saveUserProfile('crypto')">保存</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 履歴 -->
+            <div id="userHistory" class="tab-content">
+                <div class="nav-tabs" style="margin-bottom: 1rem;">
+                    <button class="nav-tab active" onclick="showHistoryTab('purchase')">購入履歴</button>
+                    <button class="nav-tab" onclick="showHistoryTab('cashout')">換金履歴</button>
+                </div>
+
+                <div id="historyPurchase" class="history-tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>購入履歴</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>金額</th>
+                                    <th>決済方法</th>
+                                    <th>ステータス</th>
+                                    <th>申請日</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userPurchaseHistory">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="historyCashout" class="history-tab-content" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>換金履歴</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ポイント</th>
+                                    <th>金額</th>
+                                    <th>出金先</th>
+                                    <th>ステータス</th>
+                                    <th>申請日</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userCashoutHistory">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- モーダル -->
+    <div id="cryptoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCryptoModal()">&times;</span>
+            <h2>仮想通貨追加</h2>
+            <div class="form-group">
+                <label>通貨名</label>
+                <input type="text" id="modalCryptoName" placeholder="Bitcoin">
+            </div>
+            <div class="form-group">
+                <label>通貨シンボル</label>
+                <input type="text" id="modalCryptoSymbol" placeholder="BTC">
+            </div>
+            <div class="form-group">
+                <label>ウォレットアドレス</label>
+                <input type="text" id="modalCryptoAddress" placeholder="ウォレットアドレス">
+            </div>
+            <div class="form-group">
+                <label>タグ/メモ（オプション）</label>
+                <input type="text" id="modalCryptoTag" placeholder="XRPの場合はタグが必要">
+            </div>
+            <div class="form-group">
+                <label>QRコード</label>
+                <div class="file-upload" onclick="document.getElementById('modalCryptoQR').click()">
+                    <input type="file" id="modalCryptoQR" accept="image/*" onchange="uploadModalQR(event)">
+                    <p>QRコードをアップロード</p>
+                    <img id="modalCryptoQRPreview" style="max-width: 200px; display: none;">
+                </div>
+            </div>
+            <button class="btn" onclick="saveCrypto()">保存</button>
+        </div>
+    </div>
+
+    <div id="convenienceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConvenienceModal()">&times;</span>
+            <h2 id="convenienceModalTitle">コンビニ項目追加</h2>
+            <div class="form-group">
+                <label>項目名</label>
+                <input type="text" id="modalConvenienceName" placeholder="セブンイレブン">
+            </div>
+            <div class="form-group">
+                <label>詳細情報</label>
+                <textarea id="modalConvenienceDetails" placeholder="決済方法の詳細を入力"></textarea>
+            </div>
+            <button class="btn" onclick="saveConvenience()">保存</button>
+        </div>
+    </div>
+
+    <div id="userDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUserDetailModal()">&times;</span>
+            <h2>ユーザー詳細情報</h2>
+            <div id="userDetailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentUser = null;
+        let isUserMode = false;
+        let users = JSON.parse(localStorage.getItem('users')) || {};
+        let applications = JSON.parse(localStorage.getItem('applications')) || [];
+        let paymentMethods = JSON.parse(localStorage.getItem('paymentMethods')) || {
+            paypay: { enabled: true, id: '', qr: '' },
+            crypto: [],
+            bank: { enabled: true, name: '', branch: '', type: '普通', number: '', holder: '' },
+            convenience: []
+        };
+        let notifications = JSON.parse(localStorage.getItem('notifications')) || {
+            purchase: { botToken: '', chatId: '' },
+            cashout: { botToken: '', chatId: '' },
+            gasWebhook: ''
+        };
+        let csvData = [];
+        let currentEditingCrypto = null;
+        let currentEditingConvenience = null;
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUserMode();
+            loadData();
+        });
+
+        function checkUserMode() {
+            isUserMode = window.location.hash === '#user';
+            document.getElementById('modeIndicator').textContent = isUserMode ? 'ユーザーモード' : '管理モード';
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!isUserMode && username === 'admin' && password === 'admin123') {
+                currentUser = { username: 'admin', role: 'admin' };
+                showAdminSection();
+            } else if (isUserMode && users[username] && users[username].password === password) {
+                currentUser = { username: username, role: 'user' };
+                showUserSection();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function showAdminSection() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminSection').style.display = 'block';
+            loadAdminData();
+        }
+
+        function showUserSection() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('userSection').style.display = 'block';
+            document.getElementById('currentUser').textContent = currentUser.username;
+            document.getElementById('userPoints').textContent = users[currentUser.username].points || 0;
+            loadUserData();
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showApplicationTab(type) {
+            document.querySelectorAll('.application-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById(type + 'Applications').style.display = 'block';
+
+            // Update active tab
+            event.target.parentElement.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showUserTab(tabName) {
+            document.querySelectorAll('#userSection .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('#userSection .nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById('user' + capitalize(tabName)).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showProfileTab(type) {
+            document.querySelectorAll('.profile-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('profile' + capitalize(type)).style.display = 'block';
+
+            event.target.parentElement.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showHistoryTab(type) {
+            document.querySelectorAll('.history-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('history' + capitalize(type)).style.display = 'block';
+
+            event.target.parentElement.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function loadData() {
+            updateDashboard();
+            updateUsersList();
+            updateApplicationsList();
+            updatePaymentMethods();
+            loadCryptoList();
+            loadConvenienceList();
+            loadNotificationSettings();
+        }
+
+        function loadAdminData() {
+            updateDashboard();
+            updateUsersList();
+            updateApplicationsList();
+            loadCryptoList();
+            loadConvenienceList();
+        }
+
+        function loadUserData() {
+            loadUserPaymentMethods();
+            loadUserHistory();
+            loadUserProfile();
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalUsers').textContent = Object.keys(users).length;
+            document.getElementById('pendingApplications').textContent = applications.filter(app => app.status === 'pending').length;
+            document.getElementById('monthlyTransactions').textContent = applications.length;
+        }
+
+        function createUser() {
+            const username = document.getElementById('newUsername').value;
+            const password = document.getElementById('newPassword').value;
+            const points = parseInt(document.getElementById('newPoints').value) || 0;
+
+            if (!username || !password) {
+                alert('ユーザー名とパスワードを入力してください。');
+                return;
+            }
+
+            if (users[username]) {
+                alert('そのユーザー名は既に存在します。');
+                return;
+            }
+
+            users[username] = {
+                password: password,
+                points: points,
+                createdAt: new Date().toISOString(),
+                profile: {}
+            };
+
+            localStorage.setItem('users', JSON.stringify(users));
+
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newPoints').value = '0';
+
+            updateUsersList();
+            updateDashboard();
+
+            alert('ユーザーを作成しました。');
+        }
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                csvData = [];
+
+                for (let i = 1; i < lines.length; i++) { // Skip header
+                    const line = lines[i].trim();
+                    if (line) {
+                        const [username, password, points] = line.split(',');
+                        if (username && password) {
+                            csvData.push({
+                                username: username.trim(),
+                                password: password.trim(),
+                                points: parseInt(points) || 0
+                            });
+                        }
+                    }
+                }
+
+                if (csvData.length > 0) {
+                    document.getElementById('processBulkBtn').style.display = 'block';
+                    alert(`${csvData.length}件のユーザーデータが読み込まれました。`);
+                } else {
+                    alert('有効なデータが見つかりませんでした。');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processBulkUsers() {
+            let created = 0;
+            let skipped = 0;
+
+            csvData.forEach(userData => {
+                if (!users[userData.username]) {
+                    users[userData.username] = {
+                        password: userData.password,
+                        points: userData.points,
+                        createdAt: new Date().toISOString(),
+                        profile: {}
+                    };
+                    created++;
+                } else {
+                    skipped++;
+                }
+            });
+
+            localStorage.setItem('users', JSON.stringify(users));
+
+            updateUsersList();
+            updateDashboard();
+
+            csvData = [];
+            document.getElementById('processBulkBtn').style.display = 'none';
+            document.getElementById('csvFile').value = '';
+
+            alert(`${created}件のユーザーを作成しました。${skipped}件はスキップされました。`);
+        }
+
+        function updateUsersList() {
+            const tbody = document.getElementById('usersList');
+            tbody.innerHTML = '';
+
+            Object.keys(users).forEach(username => {
+                const user = users[username];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${username}</td>
+                    <td>${user.points || 0}PT</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewUserDetails('${username}')">詳細</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteUser('${username}')">削除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function viewUserDetails(username) {
+            const user = users[username];
+            const userApplications = applications.filter(app => app.username === username);
+
+            let content = `
+                <h3>ユーザー: ${username}</h3>
+                <p><strong>ポイント残高:</strong> ${user.points || 0}PT</p>
+                <p><strong>登録日:</strong> ${new Date(user.createdAt).toLocaleDateString()}</p>
+
+                <h4>登録済み決済情報</h4>
+            `;
+
+            if (user.profile) {
+                if (user.profile.bank) {
+                    content += `
+                        <p><strong>銀行口座:</strong> ${user.profile.bank.name} ${user.profile.bank.branch} ${user.profile.bank.type} ${user.profile.bank.number}</p>
+                    `;
+                }
+                if (user.profile.paypay) {
+                    content += `
+                        <p><strong>PayPay:</strong> ${user.profile.paypay.id}</p>
+                    `;
+                }
+                if (user.profile.crypto) {
+                    Object.keys(user.profile.crypto).forEach(cryptoType => {
+                        const crypto = user.profile.crypto[cryptoType];
+                        content += `
+                            <p><strong>${cryptoType}:</strong> ${crypto.address}${crypto.tag ? ' (Tag: ' + crypto.tag + ')' : ''}</p>
+                        `;
+                    });
+                }
+            }
+
+            content += `
+                <h4>申請履歴</h4>
+                <div style="max-height: 300px; overflow-y: auto;">
+            `;
+
+            userApplications.forEach(app => {
+                const statusClass = `status-${app.status}`;
+                content += `
+                    <div style="border: 1px solid #ddd; padding: 0.5rem; margin-bottom: 0.5rem; border-radius: 5px;">
+                        <p><strong>種類:</strong> ${app.type === 'purchase' ? '購入' : '換金'}</p>
+                        <p><strong>金額:</strong> ${app.type === 'purchase' ? app.amount + '円' : app.points + 'PT (' + (app.points * 1) + '円)'}</p>
+                        <p><strong>ステータス:</strong> <span class="status-badge ${statusClass}">${getStatusText(app.status)}</span></p>
+                        <p><strong>申請日:</strong> ${new Date(app.createdAt).toLocaleDateString()}</p>
+                    </div>
+                `;
+            });
+
+            content += '</div>';
+
+            document.getElementById('userDetailContent').innerHTML = content;
+            document.getElementById('userDetailModal').style.display = 'block';
+        }
+
+        function closeUserDetailModal() {
+            document.getElementById('userDetailModal').style.display = 'none';
+        }
+
+        function deleteUser(username) {
+            if (confirm(`ユーザー「${username}」を削除しますか？この操作は取り消せません。`)) {
+                delete users[username];
+                localStorage.setItem('users', JSON.stringify(users));
+                updateUsersList();
+                updateDashboard();
+            }
+        }
+
+        function updateApplicationsList() {
+            updatePurchaseApplicationsList();
+            updateCashoutApplicationsList();
+        }
+
+        function updatePurchaseApplicationsList() {
+            const tbody = document.getElementById('purchaseApplicationsList');
+            tbody.innerHTML = '';
+
+            applications.filter(app => app.type === 'purchase').forEach(app => {
+                const row = document.createElement('tr');
+                const statusClass = `status-${app.status}`;
+                row.innerHTML = `
+                    <td>${app.username}</td>
+                    <td>${app.amount}円</td>
+                    <td>${app.method}</td>
+                    <td><span class="status-badge ${statusClass}">${getStatusText(app.status)}</span></td>
+                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        ${app.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="approveApplication('${app.id}')">承認</button>
+                            <button class="btn btn-danger" onclick="rejectApplication('${app.id}')">拒否</button>
+                        ` : ''}
+                        ${app.status === 'approved' ? `
+                            <button class="btn btn-success" onclick="completeApplication('${app.id}')">完了</button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateCashoutApplicationsList() {
+            const tbody = document.getElementById('cashoutApplicationsList');
+            tbody.innerHTML = '';
+
+            applications.filter(app => app.type === 'cashout').forEach(app => {
+                const row = document.createElement('tr');
+                const statusClass = `status-${app.status}`;
+                row.innerHTML = `
+                    <td>${app.username}</td>
+                    <td>${app.points}PT</td>
+                    <td>${app.points}円</td>
+                    <td>${app.method}</td>
+                    <td><span class="status-badge ${statusClass}">${getStatusText(app.status)}</span></td>
+                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        ${app.status === 'pending' ? `
+                            <button class="btn btn-success" onclick="approveApplication('${app.id}')">承認</button>
+                            <button class="btn btn-danger" onclick="rejectApplication('${app.id}')">拒否</button>
+                        ` : ''}
+                        ${app.status === 'approved' ? `
+                            <button class="btn btn-success" onclick="completeApplication('${app.id}')">完了</button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待機中',
+                'approved': '承認済み',
+                'completed': '完了',
+                'rejected': '拒否'
+            };
+            return statusMap[status] || status;
+        }
+
+        function approveApplication(appId) {
+            const app = applications.find(a => a.id === appId);
+            if (app) {
+                app.status = 'approved';
+                localStorage.setItem('applications', JSON.stringify(applications));
+                updateApplicationsList();
+                sendNotification(app, 'approved');
+            }
+        }
+
+        function rejectApplication(appId) {
+            const app = applications.find(a => a.id === appId);
+            if (app) {
+                app.status = 'rejected';
+                localStorage.setItem('applications', JSON.stringify(applications));
+                updateApplicationsList();
+                sendNotification(app, 'rejected');
+            }
+        }
+
+        function completeApplication(appId) {
+            const app = applications.find(a => a.id === appId);
+            if (app) {
+                app.status = 'completed';
+
+                if (app.type === 'purchase') {
+                    // Add points to user
+                    if (users[app.username]) {
+                        users[app.username].points = (users[app.username].points || 0) + app.amount;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                } else if (app.type === 'cashout') {
+                    // Deduct points from user (should already be done when application was created)
+                }
+
+                localStorage.setItem('applications', JSON.stringify(applications));
+                updateApplicationsList();
+                updateDashboard();
+                sendNotification(app, 'completed');
+            }
+        }
+
+        function updatePaymentMethods() {
+            // PayPay
+            document.getElementById('paypayEnabled').checked = paymentMethods.paypay.enabled;
+            document.getElementById('paypayId').value = paymentMethods.paypay.id || '';
+            if (paymentMethods.paypay.qr) {
+                document.getElementById('paypayQRPreview').src = paymentMethods.paypay.qr;
+                document.getElementById('paypayQRPreview').style.display = 'block';
+            }
+
+            // Bank
+            document.getElementById('bankEnabled').checked = paymentMethods.bank.enabled;
+            document.getElementById('bankName').value = paymentMethods.bank.name || '';
+            document.getElementById('branchName').value = paymentMethods.bank.branch || '';
+            document.getElementById('accountType').value = paymentMethods.bank.type || '普通';
+            document.getElementById('accountNumber').value = paymentMethods.bank.number || '';
+            document.getElementById('accountHolder').value = paymentMethods.bank.holder || '';
+        }
+
+        function togglePaymentMethod(method) {
+            const enabled = document.getElementById(method + 'Enabled').checked;
+            paymentMethods[method].enabled = enabled;
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            document.getElementById(method + 'Settings').style.display = enabled ? 'block' : 'none';
+        }
+
+        function savePaymentSettings(method) {
+            if (method === 'paypay') {
+                paymentMethods.paypay.id = document.getElementById('paypayId').value;
+            } else if (method === 'bank') {
+                paymentMethods.bank.name = document.getElementById('bankName').value;
+                paymentMethods.bank.branch = document.getElementById('branchName').value;
+                paymentMethods.bank.type = document.getElementById('accountType').value;
+                paymentMethods.bank.number = document.getElementById('accountNumber').value;
+                paymentMethods.bank.holder = document.getElementById('accountHolder').value;
+            }
+
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            alert('設定を保存しました。');
+        }
+
+        function uploadQR(method, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const dataUrl = e.target.result;
+                paymentMethods[method].qr = dataUrl;
+                document.getElementById(method + 'QRPreview').src = dataUrl;
+                document.getElementById(method + 'QRPreview').style.display = 'block';
+                localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addCryptoModal() {
+            currentEditingCrypto = null;
+            document.getElementById('modalCryptoName').value = '';
+            document.getElementById('modalCryptoSymbol').value = '';
+            document.getElementById('modalCryptoAddress').value = '';
+            document.getElementById('modalCryptoTag').value = '';
+            document.getElementById('modalCryptoQRPreview').style.display = 'none';
+            document.getElementById('cryptoModal').style.display = 'block';
+        }
+
+        function editCrypto(index) {
+            const crypto = paymentMethods.crypto[index];
+            currentEditingCrypto = index;
+            document.getElementById('modalCryptoName').value = crypto.name;
+            document.getElementById('modalCryptoSymbol').value = crypto.symbol;
+            document.getElementById('modalCryptoAddress').value = crypto.address;
+            document.getElementById('modalCryptoTag').value = crypto.tag || '';
+            if (crypto.qr) {
+                document.getElementById('modalCryptoQRPreview').src = crypto.qr;
+                document.getElementById('modalCryptoQRPreview').style.display = 'block';
+            }
+            document.getElementById('cryptoModal').style.display = 'block';
+        }
+
+        function saveCrypto() {
+            const name = document.getElementById('modalCryptoName').value;
+            const symbol = document.getElementById('modalCryptoSymbol').value;
+            const address = document.getElementById('modalCryptoAddress').value;
+            const tag = document.getElementById('modalCryptoTag').value;
+
+            if (!name || !symbol || !address) {
+                alert('必須項目を入力してください。');
+                return;
+            }
+
+            const cryptoData = {
+                name: name,
+                symbol: symbol,
+                address: address,
+                tag: tag,
+                enabled: true,
+                qr: paymentMethods.crypto[currentEditingCrypto]?.qr || ''
+            };
+
+            if (currentEditingCrypto !== null) {
+                paymentMethods.crypto[currentEditingCrypto] = cryptoData;
+            } else {
+                paymentMethods.crypto.push(cryptoData);
+            }
+
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            loadCryptoList();
+            closeCryptoModal();
+        }
+
+        function uploadModalQR(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('modalCryptoQRPreview').src = e.target.result;
+                document.getElementById('modalCryptoQRPreview').style.display = 'block';
+
+                // Store QR temporarily
+                if (currentEditingCrypto !== null) {
+                    paymentMethods.crypto[currentEditingCrypto].qr = e.target.result;
+                } else {
+                    // Will be saved when saveCrypto is called
+                    document.getElementById('modalCryptoQRPreview').dataset.qr = e.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function closeCryptoModal() {
+            document.getElementById('cryptoModal').style.display = 'none';
+        }
+
+        function loadCryptoList() {
+            const container = document.getElementById('cryptoList');
+            container.innerHTML = '';
+
+            paymentMethods.crypto.forEach((crypto, index) => {
+                const cryptoDiv = document.createElement('div');
+                cryptoDiv.className = 'payment-method';
+                cryptoDiv.innerHTML = `
+                    <div class="payment-method-header">
+                        <h4>${crypto.name} (${crypto.symbol})</h4>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${crypto.enabled ? 'checked' : ''} onchange="toggleCrypto(${index})">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div style="display: ${crypto.enabled ? 'block' : 'none'};" id="cryptoSettings${index}">
+                        <p><strong>アドレス:</strong> ${crypto.address} 
+                            <button class="copy-btn" onclick="copyToClipboard('${crypto.address}')">コピー</button>
+                        </p>
+                        ${crypto.tag ? `<p><strong>タグ/メモ:</strong> ${crypto.tag}</p>` : ''}
+                        ${crypto.qr ? `<img src="${crypto.qr}" style="max-width: 100px; margin: 0.5rem 0;">` : ''}
+                        <div>
+                            <button class="btn btn-secondary" onclick="editCrypto(${index})">編集</button>
+                            <button class="btn btn-danger" onclick="deleteCrypto(${index})">削除</button>
+                            <button class="btn" onclick="saveCryptoSettings(${index})">保存</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(cryptoDiv);
+            });
+        }
+
+        function toggleCrypto(index) {
+            paymentMethods.crypto[index].enabled = !paymentMethods.crypto[index].enabled;
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            loadCryptoList();
+        }
+
+        function saveCryptoSettings(index) {
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            alert('設定を保存しました。');
+        }
+
+        function deleteCrypto(index) {
+            if (confirm('この仮想通貨を削除しますか？')) {
+                paymentMethods.crypto.splice(index, 1);
+                localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+                loadCryptoList();
+            }
+        }
+
+        function addConvenienceModal() {
+            currentEditingConvenience = null;
+            document.getElementById('convenienceModalTitle').textContent = 'コンビニ項目追加';
+            document.getElementById('modalConvenienceName').value = '';
+            document.getElementById('modalConvenienceDetails').value = '';
+            document.getElementById('convenienceModal').style.display = 'block';
+        }
+
+        function editConvenience(index) {
+            const convenience = paymentMethods.convenience[index];
+            currentEditingConvenience = index;
+            document.getElementById('convenienceModalTitle').textContent = 'コンビニ項目編集';
+            document.getElementById('modalConvenienceName').value = convenience.name;
+            document.getElementById('modalConvenienceDetails').value = convenience.details;
+            document.getElementById('convenienceModal').style.display = 'block';
+        }
+
+        function saveConvenience() {
+            const name = document.getElementById('modalConvenienceName').value;
+            const details = document.getElementById('modalConvenienceDetails').value;
+
+            if (!name || !details) {
+                alert('項目名と詳細情報を入力してください。');
+                return;
+            }
+
+            const convenienceData = {
+                name: name,
+                details: details,
+                enabled: true
+            };
+
+            if (currentEditingConvenience !== null) {
+                paymentMethods.convenience[currentEditingConvenience] = convenienceData;
+            } else {
+                paymentMethods.convenience.push(convenienceData);
+            }
+
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            loadConvenienceList();
+            closeConvenienceModal();
+        }
+
+        function closeConvenienceModal() {
+            document.getElementById('convenienceModal').style.display = 'none';
+        }
+
+        function loadConvenienceList() {
+            const container = document.getElementById('convenienceList');
+            container.innerHTML = '';
+
+            paymentMethods.convenience.forEach((convenience, index) => {
+                const convenienceDiv = document.createElement('div');
+                convenienceDiv.className = 'payment-method';
+                convenienceDiv.innerHTML = `
+                    <div class="payment-method-header">
+                        <h4>${convenience.name}</h4>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${convenience.enabled ? 'checked' : ''} onchange="toggleConvenience(${index})">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div style="display: ${convenience.enabled ? 'block' : 'none'};" id="convenienceSettings${index}">
+                        <p>${convenience.details}</p>
+                        <div>
+                            <button class="btn btn-secondary" onclick="editConvenience(${index})">編集</button>
+                            <button class="btn btn-danger" onclick="deleteConvenience(${index})">削除</button>
+                            <button class="btn" onclick="saveConvenienceSettings(${index})">保存</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(convenienceDiv);
+            });
+        }
+
+        function toggleConvenience(index) {
+            paymentMethods.convenience[index].enabled = !paymentMethods.convenience[index].enabled;
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            loadConvenienceList();
+        }
+
+        function saveConvenienceSettings(index) {
+            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+            alert('設定を保存しました。');
+        }
+
+        function deleteConvenience(index) {
+            if (confirm('このコンビニ項目を削除しますか？')) {
+                paymentMethods.convenience.splice(index, 1);
+                localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+                loadConvenienceList();
+            }
+        }
+
+        function loadNotificationSettings() {
+            document.getElementById('purchaseBotToken').value = notifications.purchase.botToken || '';
+            document.getElementById('purchaseChatId').value = notifications.purchase.chatId || '';
+            document.getElementById('cashoutBotToken').value = notifications.cashout.botToken || '';
+            document.getElementById('cashoutChatId').value = notifications.cashout.chatId || '';
+            document.getElementById('gasWebhookUrl').value = notifications.gasWebhook || '';
+        }
+
+        function saveNotificationSettings() {
+            notifications.purchase.botToken = document.getElementById('purchaseBotToken').value;
+            notifications.purchase.chatId = document.getElementById('purchaseChatId').value;
+            notifications.cashout.botToken = document.getElementById('cashoutBotToken').value;
+            notifications.cashout.chatId = document.getElementById('cashoutChatId').value;
+
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            alert('通知設定を保存しました。');
+        }
+
+        function saveGASSettings() {
+            notifications.gasWebhook = document.getElementById('gasWebhookUrl').value;
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+            alert('GAS設定を保存しました。');
+        }
+
+        function sendNotification(application, action) {
+            const message = `${application.type === 'purchase' ? '購入' : '換金'}申請が${action === 'approved' ? '承認' : action === 'completed' ? '完了' : '拒否'}されました。\n` +
+                           `ユーザー: ${application.username}\n` +
+                           `${application.type === 'purchase' ? '金額: ' + application.amount + '円' : 'ポイント: ' + application.points + 'PT'}`;
+
+            const botToken = application.type === 'purchase' ? notifications.purchase.botToken : notifications.cashout.botToken;
+            const chatId = application.type === 'purchase' ? notifications.purchase.chatId : notifications.cashout.chatId;
+
+            if (botToken && chatId) {
+                // Telegram notification (simulated)
+                console.log('Telegram notification sent:', message);
+            }
+
+            if (notifications.gasWebhook) {
+                // GAS webhook (simulated)
+                console.log('GAS webhook called with data:', application);
+            }
+        }
+
+        function copyText(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            alert('コピーしました。');
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('コピーしました。');
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+            });
+        }
+
+        // ユーザー画面の機能
+        function loadUserPaymentMethods() {
+            const purchaseMethod = document.getElementById('purchaseMethod');
+            const cashoutMethod = document.getElementById('cashoutMethod');
+            const userCryptoType = document.getElementById('userCryptoType');
+
+            // Clear existing options
+            purchaseMethod.innerHTML = '<option value="">選択してください</option>';
+            cashoutMethod.innerHTML = '<option value="">選択してください</option>';
+            userCryptoType.innerHTML = '<option value="">選択してください</option>';
+
+            // PayPay
+            if (paymentMethods.paypay.enabled) {
+                purchaseMethod.innerHTML += '<option value="paypay">PayPay</option>';
+                cashoutMethod.innerHTML += '<option value="paypay">PayPay</option>';
+            }
+
+            // Crypto
+            paymentMethods.crypto.forEach(crypto => {
+                if (crypto.enabled) {
+                    purchaseMethod.innerHTML += `<option value="crypto-${crypto.symbol}">${crypto.name}</option>`;
+                    cashoutMethod.innerHTML += `<option value="crypto-${crypto.symbol}">${crypto.name}</option>`;
+                    userCryptoType.innerHTML += `<option value="${crypto.symbol}">${crypto.name}</option>`;
+                }
+            });
+
+            // Bank
+            if (paymentMethods.bank.enabled) {
+                cashoutMethod.innerHTML += '<option value="bank">銀行振込</option>';
+            }
+
+            // Convenience
+            paymentMethods.convenience.forEach(convenience => {
+                if (convenience.enabled) {
+                    purchaseMethod.innerHTML += `<option value="convenience-${convenience.name}">${convenience.name}</option>`;
+                }
+            });
+        }
+
+        function showPaymentInfo() {
+            const method = document.getElementById('purchaseMethod').value;
+            const paymentInfo = document.getElementById('paymentInfo');
+            const paymentDetails = document.getElementById('paymentDetails');
+
+            if (!method) {
+                paymentInfo.style.display = 'none';
+                return;
+            }
+
+            let details = '';
+
+            if (method === 'paypay') {
+                details = `
+                    <h4>PayPay決済</h4>
+                    <p><strong>PayPay ID:</strong> ${paymentMethods.paypay.id} 
+                        <button class="copy-btn" onclick="copyToClipboard('${paymentMethods.paypay.id}')">コピー</button>
+                    </p>
+                    ${paymentMethods.paypay.qr ? `<img src="${paymentMethods.paypay.qr}" style="max-width: 200px;">` : ''}
+                `;
+            } else if (method.startsWith('crypto-')) {
+                const symbol = method.replace('crypto-', '');
+                const crypto = paymentMethods.crypto.find(c => c.symbol === symbol);
+                if (crypto) {
+                    details = `
+                        <h4>${crypto.name}決済</h4>
+                        <p><strong>ウォレットアドレス:</strong> ${crypto.address} 
+                            <button class="copy-btn" onclick="copyToClipboard('${crypto.address}')">コピー</button>
+                        </p>
+                        ${crypto.tag ? `<p><strong>タグ/メモ:</strong> ${crypto.tag}</p>` : ''}
+                        ${crypto.qr ? `<img src="${crypto.qr}" style="max-width: 200px;">` : ''}
+                    `;
+                }
+            } else if (method.startsWith('convenience-')) {
+                const name = method.replace('convenience-', '');
+                const convenience = paymentMethods.convenience.find(c => c.name === name);
+                if (convenience) {
+                    details = `
+                        <h4>${convenience.name}</h4>
+                        <p>${convenience.details}</p>
+                    `;
+                }
+            }
+
+            paymentDetails.innerHTML = details;
+            paymentInfo.style.display = 'block';
+        }
+
+        function showCashoutInfo() {
+            const method = document.getElementById('cashoutMethod').value;
+            const cashoutInfo = document.getElementById('cashoutInfo');
+            const cashoutDetails = document.getElementById('cashoutDetails');
+
+            if (!method) {
+                cashoutInfo.style.display = 'none';
+                return;
+            }
+
+            const user = users[currentUser.username];
+            let details = '';
+
+            if (method === 'paypay' && user.profile.paypay) {
+                details = `
+                    <h4>PayPay出金</h4>
+                    <p><strong>PayPay ID:</strong> ${user.profile.paypay.id}</p>
+                    <p><strong>名義:</strong> ${user.profile.paypay.name}</p>
+                `;
+            } else if (method.startsWith('crypto-') && user.profile.crypto) {
+                const symbol = method.replace('crypto-', '');
+                const crypto = user.profile.crypto[symbol];
+                if (crypto) {
+                    details = `
+                        <h4>${symbol}出金</h4>
+                        <p><strong>ウォレットアドレス:</strong> ${crypto.address}</p>
+                        ${crypto.tag ? `<p><strong>タグ/メモ:</strong> ${crypto.tag}</p>` : ''}
+                    `;
+                }
+            } else if (method === 'bank' && user.profile.bank) {
+                details = `
+                    <h4>銀行振込</h4>
+                    <p><strong>銀行:</strong> ${user.profile.bank.name}</p>
+                    <p><strong>支店:</strong> ${user.profile.bank.branch}</p>
+                    <p><strong>口座種別:</strong> ${user.profile.bank.type}</p>
+                    <p><strong>口座番号:</strong> ${user.profile.bank.number}</p>
+                    <p><strong>名義:</strong> ${user.profile.bank.holder}</p>
+                `;
+            } else {
+                details = '<p style="color: red;">出金先情報が未登録です。登録情報タブで設定してください。</p>';
+            }
+
+            cashoutDetails.innerHTML = details;
+            cashoutInfo.style.display = 'block';
+        }
+
+        function uploadProof(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('proofPreview').src = e.target.result;
+                document.getElementById('proofPreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function submitPurchase() {
+            const amount = parseInt(document.getElementById('purchaseAmount').value);
+            const method = document.getElementById('purchaseMethod').value;
+            const proof = document.getElementById('proofPreview').src;
+
+            if (!amount || amount < 2000) {
+                alert('最低購入金額は2,000円です。');
+                return;
+            }
+
+            if (!method) {
+                alert('決済方法を選択してください。');
+                return;
+            }
+
+            const application = {
+                id: 'app_' + Date.now(),
+                username: currentUser.username,
+                type: 'purchase',
+                amount: amount,
+                method: method,
+                proof: proof,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+
+            // Show completion button
+            document.getElementById('completeDepositBtn').style.display = 'block';
+
+            alert('購入申請を送信しました。');
+
+            // Reset form
+            document.getElementById('purchaseAmount').value = '';
+            document.getElementById('purchaseMethod').value = '';
+            document.getElementById('paymentInfo').style.display = 'none';
+            document.getElementById('proofPreview').style.display = 'none';
+
+            loadUserHistory();
+        }
+
+        function completeDeposit() {
+            alert('入金完了を報告しました。');
+            document.getElementById('completeDepositBtn').style.display = 'none';
+        }
+
+        function submitCashout() {
+            const points = parseInt(document.getElementById('cashoutPoints').value);
+            const method = document.getElementById('cashoutMethod').value;
+            const user = users[currentUser.username];
+
+            if (!points || points < 4000) {
+                alert('最低換金ポイントは4,000PTです。');
+                return;
+            }
+
+            if (points > user.points) {
+                alert('ポイント残高が不足しています。');
+                return;
+            }
+
+            if (!method) {
+                alert('出金先を選択してください。');
+                return;
+            }
+
+            const application = {
+                id: 'app_' + Date.now(),
+                username: currentUser.username,
+                type: 'cashout',
+                points: points,
+                method: method,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            applications.push(application);
+
+            // Deduct points immediately
+            user.points -= points;
+            localStorage.setItem('users', JSON.stringify(users));
+            localStorage.setItem('applications', JSON.stringify(applications));
+
+            document.getElementById('userPoints').textContent = user.points;
+
+            alert('換金申請を送信しました。');
+
+            // Reset form
+            document.getElementById('cashoutPoints').value = '';
+            document.getElementById('cashoutMethod').value = '';
+            document.getElementById('cashoutInfo').style.display = 'none';
+
+            loadUserHistory();
+        }
+
+        function updateCryptoForm() {
+            const cryptoType = document.getElementById('userCryptoType').value;
+            const tagGroup = document.getElementById('cryptoTagGroup');
+
+            if (cryptoType === 'XRP' || cryptoType === 'xrp') {
+                tagGroup.style.display = 'block';
+            } else {
+                tagGroup.style.display = 'none';
+            }
+        }
+
+        function saveUserProfile(type) {
+            const user = users[currentUser.username];
+            if (!user.profile) user.profile = {};
+
+            if (type === 'bank') {
+                user.profile.bank = {
+                    name: document.getElementById('userBankName').value,
+                    branch: document.getElementById('userBranchName').value,
+                    type: document.getElementById('userAccountType').value,
+                    number: document.getElementById('userAccountNumber').value,
+                    holder: document.getElementById('userAccountHolder').value
+                };
+            } else if (type === 'paypay') {
+                user.profile.paypay = {
+                    id: document.getElementById('userPaypayId').value,
+                    name: document.getElementById('userPaypayName').value
+                };
+            } else if (type === 'crypto') {
+                const cryptoType = document.getElementById('userCryptoType').value;
+                if (cryptoType) {
+                    if (!user.profile.crypto) user.profile.crypto = {};
+                    user.profile.crypto[cryptoType] = {
+                        address: document.getElementById('userCryptoAddress').value,
+                        tag: document.getElementById('userCryptoTag').value
+                    };
+                }
+            }
+
+            localStorage.setItem('users', JSON.stringify(users));
+            alert('情報を保存しました。');
+        }
+
+        function loadUserProfile() {
+            const user = users[currentUser.username];
+            if (!user.profile) return;
+
+            // Bank
+            if (user.profile.bank) {
+                document.getElementById('userBankName').value = user.profile.bank.name || '';
+                document.getElementById('userBranchName').value = user.profile.bank.branch || '';
+                document.getElementById('userAccountType').value = user.profile.bank.type || '普通';
+                document.getElementById('userAccountNumber').value = user.profile.bank.number || '';
+                document.getElementById('userAccountHolder').value = user.profile.bank.holder || '';
+            }
+
+            // PayPay
+            if (user.profile.paypay) {
+                document.getElementById('userPaypayId').value = user.profile.paypay.id || '';
+                document.getElementById('userPaypayName').value = user.profile.paypay.name || '';
+            }
+        }
+
+        function loadUserHistory() {
+            const userApps = applications.filter(app => app.username === currentUser.username);
+
+            // Purchase history
+            const purchaseHistoryBody = document.getElementById('userPurchaseHistory');
+            purchaseHistoryBody.innerHTML = '';
+            userApps.filter(app => app.type === 'purchase').forEach(app => {
+                const row = document.createElement('tr');
+                const statusClass = `status-${app.status}`;
+                row.innerHTML = `
+                    <td>${app.amount}円</td>
+                    <td>${app.method}</td>
+                    <td><span class="status-badge ${statusClass}">${getStatusText(app.status)}</span></td>
+                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                `;
+                purchaseHistoryBody.appendChild(row);
+            });
+
+            // Cashout history
+            const cashoutHistoryBody = document.getElementById('userCashoutHistory');
+            cashoutHistoryBody.innerHTML = '';
+            userApps.filter(app => app.type === 'cashout').forEach(app => {
+                const row = document.createElement('tr');
+                const statusClass = `status-${app.status}`;
+                row.innerHTML = `
+                    <td>${app.points}PT</td>
+                    <td>${app.points}円</td>
+                    <td>${app.method}</td>
+                    <td><span class="status-badge ${statusClass}">${getStatusText(app.status)}</span></td>
+                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                `;
+                cashoutHistoryBody.appendChild(row);
+            });
+        }
+
+        // Update cashout amount calculation
+        document.getElementById('cashoutPoints').addEventListener('input', function() {
+            const points = parseInt(this.value) || 0;
+            document.getElementById('cashoutAmount').textContent = points;
+        });
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Handle browser back/forward for user mode
+        window.addEventListener('hashchange', function() {
+            checkUserMode();
+            if (currentUser) {
+                logout();
+            }
+        });
+        // ダッシュボード機能
+        function updateDashboard() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const purchaseApplications = JSON.parse(localStorage.getItem('purchaseApplications') || '[]');
+            const cashoutApplications = JSON.parse(localStorage.getItem('cashoutApplications') || '[]');
+
+            // 基本統計
+            document.getElementById('totalUsers').textContent = users.length;
+
+            const today = new Date().toDateString();
+            const todayPurchase = purchaseApplications.filter(app => new Date(app.timestamp).toDateString() === today).length;
+            const todayCashout = cashoutApplications.filter(app => new Date(app.timestamp).toDateString() === today).length;
+
+            document.getElementById('todayPurchase').textContent = todayPurchase;
+            document.getElementById('todayCashout').textContent = todayCashout;
+
+            // 総取引額計算
+            const totalPurchase = purchaseApplications.reduce((sum, app) => sum + (parseFloat(app.amount) || 0), 0);
+            const totalCashoutAmount = cashoutApplications.reduce((sum, app) => sum + (parseFloat(app.points) || 0), 0);
+            document.getElementById('totalAmount').textContent = '¥' + (totalPurchase + totalCashoutAmount).toLocaleString();
+
+            // 決済方法別統計
+            updatePaymentCharts(purchaseApplications, cashoutApplications);
+            updateTransactionChart('daily');
+        }
+
+        function updatePaymentCharts(purchaseApps, cashoutApps) {
+            // 購入決済方法統計
+            const purchasePayments = {};
+            purchaseApps.forEach(app => {
+                const method = app.paymentMethod || '不明';
+                purchasePayments[method] = (purchasePayments[method] || 0) + 1;
+            });
+
+            // 換金決済方法統計
+            const cashoutPayments = {};
+            cashoutApps.forEach(app => {
+                const method = app.paymentMethod || '不明';
+                cashoutPayments[method] = (cashoutPayments[method] || 0) + 1;
+            });
+
+            drawPieChart('purchasePaymentChart', purchasePayments, 'purchasePaymentLegend');
+            drawPieChart('cashoutPaymentChart', cashoutPayments, 'cashoutPaymentLegend');
+        }
+
+        function drawPieChart(canvasId, data, legendId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const legend = document.getElementById(legendId);
+
+            if (!canvas || !ctx) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+            if (total === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.fillText('データなし', canvas.width/2 - 30, canvas.height/2);
+                legend.innerHTML = '';
+                return;
+            }
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = Math.min(centerX, centerY) - 10;
+
+            const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#f7b731', '#5f27cd'];
+            let currentAngle = 0;
+            let colorIndex = 0;
+            let legendHTML = '';
+
+            Object.entries(data).forEach(([method, count]) => {
+                const sliceAngle = (count / total) * 2 * Math.PI;
+                const color = colors[colorIndex % colors.length];
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.stroke();
+
+                const percentage = ((count / total) * 100).toFixed(1);
+                legendHTML += `<div style="display: inline-block; margin: 0.25rem 0.5rem;"><span style="display: inline-block; width: 12px; height: 12px; background: ${color}; margin-right: 0.5rem;"></span>${method}: ${count}件 (${percentage}%)</div>`;
+
+                currentAngle += sliceAngle;
+                colorIndex++;
+            });
+
+            legend.innerHTML = legendHTML;
+        }
+
+        function updateChart(period) {
+            const purchaseApps = JSON.parse(localStorage.getItem('purchaseApplications') || '[]');
+            const cashoutApps = JSON.parse(localStorage.getItem('cashoutApplications') || '[]');
+
+            // ボタンのアクティブ状態更新
+            document.getElementById('dailyBtn').style.background = period === 'daily' ? '#ffd700' : '#f8f9fa';
+            document.getElementById('monthlyBtn').style.background = period === 'monthly' ? '#ffd700' : '#f8f9fa';
+
+            const canvas = document.getElementById('transactionChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const transactionData = calculateTransactionData(purchaseApps, cashoutApps, period);
+            drawLineChart(ctx, canvas, transactionData, period);
+            updateTransactionTable(transactionData);
+        }
+
+        function calculateTransactionData(purchaseApps, cashoutApps, period) {
+            const data = {};
+
+            // 購入データの集計
+            purchaseApps.forEach(app => {
+                const date = new Date(app.timestamp);
+                const key = period === 'daily' 
+                    ? date.toISOString().split('T')[0]
+                    : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+                if (!data[key]) {
+                    data[key] = { purchase: 0, cashout: 0 };
+                }
+                data[key].purchase += parseFloat(app.amount) || 0;
+            });
+
+            // 換金データの集計
+            cashoutApps.forEach(app => {
+                const date = new Date(app.timestamp);
+                const key = period === 'daily' 
+                    ? date.toISOString().split('T')[0]
+                    : `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+                if (!data[key]) {
+                    data[key] = { purchase: 0, cashout: 0 };
+                }
+                data[key].cashout += parseFloat(app.points) || 0;
+            });
+
+            return Object.entries(data)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .slice(-30); // 最新30件
+        }
+
+        function drawLineChart(ctx, canvas, data, period) {
+            const padding = 50;
+            const chartWidth = canvas.width - padding * 2;
+            const chartHeight = canvas.height - padding * 2;
+
+            if (data.length === 0) {
+                ctx.fillStyle = '#ccc';
+                ctx.fillText('データなし', canvas.width/2 - 30, canvas.height/2);
+                return;
+            }
+
+            const maxValue = Math.max(...data.map(([, values]) => Math.max(values.purchase, values.cashout))) || 1;
+
+            // グリッド線とラベル
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.beginPath();
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+
+                ctx.fillStyle = '#666';
+                ctx.fillText((maxValue - (maxValue / 5) * i).toFixed(0), 10, y + 5);
+            }
+            ctx.stroke();
+
+            // データライン描画
+            drawDataLine(ctx, data, chartWidth, chartHeight, padding, maxValue, '#28a745', 'purchase');
+            drawDataLine(ctx, data, chartWidth, chartHeight, padding, maxValue, '#007bff', 'cashout');
+
+            // 凡例
+            ctx.fillStyle = '#28a745';
+            ctx.fillRect(canvas.width - 150, 20, 15, 15);
+            ctx.fillStyle = '#000';
+            ctx.fillText('購入額', canvas.width - 130, 32);
+
+            ctx.fillStyle = '#007bff';
+            ctx.fillRect(canvas.width - 150, 40, 15, 15);
+            ctx.fillStyle = '#000';
+            ctx.fillText('換金額', canvas.width - 130, 52);
+        }
+
+        function drawDataLine(ctx, data, chartWidth, chartHeight, padding, maxValue, color, type) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            data.forEach(([date, values], index) => {
+                const x = padding + (chartWidth / (data.length - 1)) * index;
+                const y = padding + chartHeight - (values[type] / maxValue) * chartHeight;
+
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
+                // データポイント
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            ctx.stroke();
+        }
+
+        function updateTransactionTable(data) {
+            const tbody = document.getElementById('transactionTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(([date, values]) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = date;
+                row.insertCell(1).textContent = '¥' + values.purchase.toLocaleString();
+                row.insertCell(2).textContent = '¥' + values.cashout.toLocaleString();
+                row.insertCell(3).textContent = '¥' + (values.purchase - values.cashout).toLocaleString();
+            });
+        }
+
+        // ユーザー履歴機能
+        let currentHistoryPage = 1;
+        let allUserHistory = [];
+        let filteredHistory = [];
+
+        function loadUserHistory() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const purchaseApps = JSON.parse(localStorage.getItem('purchaseApplications') || '[]');
+            const cashoutApps = JSON.parse(localStorage.getItem('cashoutApplications') || '[]');
+
+            allUserHistory = [];
+
+            // 購入申請履歴
+            purchaseApps.forEach(app => {
+                const user = users.find(u => u.username === app.username);
+                allUserHistory.push({
+                    timestamp: app.timestamp,
+                    username: app.username,
+                    type: 'purchase',
+                    amount: app.amount,
+                    paymentMethod: app.paymentMethod,
+                    status: app.status,
+                    details: `申請ID: ${app.id}\n金額: ¥${app.amount}\n決済情報: ${app.paymentInfo || '未設定'}`,
+                    userData: user
+                });
+            });
+
+            // 換金申請履歴
+            cashoutApps.forEach(app => {
+                const user = users.find(u => u.username === app.username);
+                allUserHistory.push({
+                    timestamp: app.timestamp,
+                    username: app.username,
+                    type: 'cashout',
+                    amount: app.points,
+                    paymentMethod: app.paymentMethod,
+                    status: app.status,
+                    details: `申請ID: ${app.id}\nポイント: ${app.points}PT\n決済情報: ${app.paymentInfo || '未設定'}`,
+                    userData: user
+                });
+            });
+
+            // 日時でソート（新しい順）
+            allUserHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            filteredHistory = [...allUserHistory];
+            displayUserHistory();
+        }
+
+        function filterUserHistory() {
+            const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('transactionTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const periodFilter = document.getElementById('periodFilter').value;
+
+            filteredHistory = allUserHistory.filter(record => {
+                // ユーザー名フィルター
+                if (searchTerm && !record.username.toLowerCase().includes(searchTerm)) {
+                    return false;
+                }
+
+                // 取引種別フィルター
+                if (typeFilter && record.type !== typeFilter) {
+                    return false;
+                }
+
+                // ステータスフィルター
+                if (statusFilter && record.status !== statusFilter) {
+                    return false;
+                }
+
+                // 期間フィルター
+                if (periodFilter) {
+                    const recordDate = new Date(record.timestamp);
+                    const now = new Date();
+                    const daysDiff = Math.floor((now - recordDate) / (1000 * 60 * 60 * 24));
+
+                    switch(periodFilter) {
+                        case 'today':
+                            if (daysDiff > 0) return false;
+                            break;
+                        case 'week':
+                            if (daysDiff > 7) return false;
+                            break;
+                        case 'month':
+                            if (daysDiff > 30) return false;
+                            break;
+                        case '3months':
+                            if (daysDiff > 90) return false;
+                            break;
+                    }
+                }
+
+                return true;
+            });
+
+            currentHistoryPage = 1;
+            displayUserHistory();
+        }
+
+        function displayUserHistory() {
+            const tbody = document.getElementById('userHistoryTableBody');
+            const itemsPerPage = 20;
+            const startIndex = (currentHistoryPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageData = filteredHistory.slice(startIndex, endIndex);
+
+            tbody.innerHTML = '';
+
+            pageData.forEach(record => {
+                const row = tbody.insertRow();
+
+                // 日時
+                const date = new Date(record.timestamp);
+                row.insertCell(0).textContent = date.toLocaleDateString('ja-JP') + ' ' + date.toLocaleTimeString('ja-JP', {hour: '2-digit', minute: '2-digit'});
+
+                // ユーザー名
+                row.insertCell(1).textContent = record.username;
+
+                // 種別
+                const typeCell = row.insertCell(2);
+                typeCell.textContent = record.type === 'purchase' ? '購入' : '換金';
+                typeCell.style.color = record.type === 'purchase' ? '#28a745' : '#007bff';
+
+                // 金額/PT
+                row.insertCell(3).textContent = record.type === 'purchase' ? '¥' + record.amount : record.amount + 'PT';
+
+                // 決済方法
+                row.insertCell(4).textContent = record.paymentMethod || '未設定';
+
+                // ステータス
+                const statusCell = row.insertCell(5);
+                const statusMap = {
+                    'pending': { text: '申請中', color: '#ffc107' },
+                    'processing': { text: '処理中', color: '#17a2b8' },
+                    'completed': { text: '完了', color: '#28a745' },
+                    'rejected': { text: '拒否', color: '#dc3545' }
+                };
+                const statusInfo = statusMap[record.status] || { text: record.status, color: '#6c757d' };
+                statusCell.textContent = statusInfo.text;
+                statusCell.style.color = statusInfo.color;
+                statusCell.style.fontWeight = 'bold';
+
+                // 詳細情報
+                const detailsCell = row.insertCell(6);
+                detailsCell.innerHTML = record.details.replace(/\n/g, '<br>');
+                detailsCell.style.fontSize = '0.9em';
+
+                // 操作
+                const actionCell = row.insertCell(7);
+                actionCell.innerHTML = `
+                    <button class="btn" style="padding: 0.25rem 0.5rem; margin: 0.1rem;" onclick="viewUserDetails('${record.username}')">詳細</button>
+                    <button class="btn" style="padding: 0.25rem 0.5rem; margin: 0.1rem; background: #dc3545;" onclick="deleteHistoryRecord('${record.timestamp}', '${record.type}')">削除</button>
+                `;
+            });
+
+            updateHistoryPagination();
+        }
+
+        function updateHistoryPagination() {
+            const pagination = document.getElementById('historyPagination');
+            const itemsPerPage = 20;
+            const totalPages = Math.ceil(filteredHistory.length / itemsPerPage);
+
+            let paginationHTML = `<span>合計: ${filteredHistory.length}件</span> `;
+
+            if (totalPages > 1) {
+                if (currentHistoryPage > 1) {
+                    paginationHTML += `<button class="btn" onclick="changeHistoryPage(${currentHistoryPage - 1})">前</button> `;
+                }
+
+                for (let i = Math.max(1, currentHistoryPage - 2); i <= Math.min(totalPages, currentHistoryPage + 2); i++) {
+                    const active = i === currentHistoryPage ? ' style="background: #ffd700;"' : '';
+                    paginationHTML += `<button class="btn"${active} onclick="changeHistoryPage(${i})">${i}</button> `;
+                }
+
+                if (currentHistoryPage < totalPages) {
+                    paginationHTML += `<button class="btn" onclick="changeHistoryPage(${currentHistoryPage + 1})">次</button>`;
+                }
+            }
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function changeHistoryPage(page) {
+            currentHistoryPage = page;
+            displayUserHistory();
+        }
+
+        function refreshUserHistory() {
+            loadUserHistory();
+            alert('履歴を更新しました');
+        }
+
+        function exportUserHistory() {
+            if (filteredHistory.length === 0) {
+                alert('エクスポートするデータがありません');
+                return;
+            }
+
+            const csv = [
+                ['日時', 'ユーザー名', '種別', '金額/PT', '決済方法', 'ステータス', '詳細'],
+                ...filteredHistory.map(record => [
+                    new Date(record.timestamp).toLocaleString('ja-JP'),
+                    record.username,
+                    record.type === 'purchase' ? '購入' : '換金',
+                    record.type === 'purchase' ? '¥' + record.amount : record.amount + 'PT',
+                    record.paymentMethod || '未設定',
+                    record.status,
+                    record.details.replace(/\n/g, ' ')
+                ])
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `user_history_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function viewUserDetails(username) {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.username === username);
+
+            if (user) {
+                let details = `ユーザー詳細: ${username}\n\n`;
+                details += `作成日: ${new Date(user.createdAt || Date.now()).toLocaleString('ja-JP')}\n`;
+                details += `ポイント残高: ${user.points || 0}PT\n\n`;
+
+                if (user.paymentMethods) {
+                    details += `登録済み決済方法:\n`;
+                    Object.entries(user.paymentMethods).forEach(([method, info]) => {
+                        details += `- ${method}: ${typeof info === 'object' ? JSON.stringify(info) : info}\n`;
+                    });
+                }
+
+                alert(details);
+            }
+        }
+
+        function deleteHistoryRecord(timestamp, type) {
+            if (!confirm('この履歴を削除しますか？')) return;
+
+            const storageKey = type === 'purchase' ? 'purchaseApplications' : 'cashoutApplications';
+            const applications = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const filteredApps = applications.filter(app => app.timestamp !== timestamp);
+
+            localStorage.setItem(storageKey, JSON.stringify(filteredApps));
+            loadUserHistory();
+            alert('履歴を削除しました');
+        }
+
+        // 初期化時にダッシュボードとユーザー履歴を読み込み
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash !== '#user') {
+                setTimeout(() => {
+                    updateDashboard();
+                    loadUserHistory();
+                }, 100);
+            }
+        });
+
+        // 既存のshowTab関数を拡張
+        const originalShowTab = window.showTab;
+        window.showTab = function(tabName) {
+            if (originalShowTab) {
+                originalShowTab(tabName);
+            }
+
+            if (tabName === 'dashboard') {
+                setTimeout(updateDashboard, 100);
+            } else if (tabName === 'user-history') {
+                setTimeout(loadUserHistory, 100);
+            }
+        };
+
+    </script>
+</body>
+</html>
