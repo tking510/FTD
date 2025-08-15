@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポイント交換プラットフォーム</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --secondary-gold: #FFA500;
+            --accent-gold: #DAA520;
+            --light-gold: #FFFACD;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, var(--light-gold) 100%);
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 100%);
+        }
+        
+        .gold-border {
+            border: 2px solid var(--accent-gold);
+        }
+        
+        .gold-text {
+            color: var(--accent-gold);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 8px 25px rgba(218, 165, 32, 0.15);
+        }
+        
+        .btn-gold {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .admin-nav {
+            background: linear-gradient(135deg, #ffffff 0%, var(--light-gold) 100%);
+            border-bottom: 3px solid var(--accent-gold);
+        }
+        
+        .stats-card {
+            background: white;
+            border-left: 4px solid var(--primary-gold);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .user-screen {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, var(--light-gold) 50%, #ffffff 100%);
+        }
+        
+        .qr-container {
+            max-width: 200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- ログイン画面 -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg card-shadow max-w-md w-full mx-4">
+            <div class="text-center mb-8">
+                <i class="fas fa-crown text-6xl gold-text mb-4"></i>
+                <h1 class="text-3xl font-bold gold-text">ポイント交換プラットフォーム</h1>
+                <p class="text-gray-600 mt-2">管理画面</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">管理者ID</label>
+                    <input type="text" id="adminId" class="w-full px-3 py-2 border gold-border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">パスワード</label>
+                    <input type="password" id="adminPassword" class="w-full px-3 py-2 border gold-border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                </div>
+                <button type="submit" class="w-full btn-gold py-3 px-4 rounded-lg text-white font-bold">
+                    <i class="fas fa-sign-in-alt mr-2"></i>ログイン
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ユーザー画面 -->
+    <div id="userScreen" class="user-screen hidden">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-md mx-auto">
+                <!-- ユーザーログイン -->
+                <div id="userLoginForm" class="bg-white p-8 rounded-lg card-shadow">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-coins text-6xl gold-text mb-4"></i>
+                        <h1 class="text-3xl font-bold gold-text">ポイント交換</h1>
+                        <p class="text-gray-600 mt-2">ユーザーログイン</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">電話番号</label>
+                        <input type="tel" id="userPhone" class="w-full px-3 py-2 border gold-border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" placeholder="09012345678" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">パスワード</label>
+                        <input type="password" id="userPassword" class="w-full px-3 py-2 border gold-border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
+                    </div>
+                    <button onclick="userLogin()" class="w-full btn-gold py-3 px-4 rounded-lg text-white font-bold">
+                        <i class="fas fa-sign-in-alt mr-2"></i>ログイン
+                    </button>
+                </div>
+
+                <!-- ユーザーダッシュボード -->
+                <div id="userDashboard" class="hidden">
+                    <div class="bg-white p-6 rounded-lg card-shadow mb-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold gold-text">ポイント交換</h2>
+                            <button onclick="userLogout()" class="text-gray-500 hover:text-red-500">
+                                <i class="fas fa-sign-out-alt"></i> ログアウト
+                            </button>
+                        </div>
+                        <div class="text-center mb-6">
+                            <p class="text-gray-600">現在のポイント</p>
+                            <p class="text-4xl font-bold gold-text" id="userPoints">0 PT</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="showPurchaseForm()" class="btn-gold py-3 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-plus mr-2"></i>購入
+                            </button>
+                            <button onclick="showWithdrawForm()" class="bg-green-500 hover:bg-green-600 py-3 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-minus mr-2"></i>換金
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 購入フォーム -->
+                    <div id="purchaseForm" class="bg-white p-6 rounded-lg card-shadow mb-6 hidden">
+                        <h3 class="text-xl font-bold mb-4 gold-text">ポイント購入</h3>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">金額（最低2,000円）</label>
+                            <input type="number" id="purchaseAmount" min="2000" class="w-full px-3 py-2 border gold-border rounded-lg" placeholder="2000">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">決済方法</label>
+                            <select id="purchaseMethod" class="w-full px-3 py-2 border gold-border rounded-lg" onchange="showPaymentInfo()">
+                                <option value="">選択してください</option>
+                                <option value="paypay">PayPay</option>
+                                <option value="crypto">仮想通貨</option>
+                                <option value="bank">銀行振込</option>
+                                <option value="convenience">コンビニ決済</option>
+                            </select>
+                        </div>
+                        <div id="cryptoSelect" class="mb-4 hidden">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">通貨選択</label>
+                            <select id="cryptoType" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                <option value="">選択してください</option>
+                            </select>
+                        </div>
+                        <div id="convenienceSelect" class="mb-4 hidden">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">コンビニ選択</label>
+                            <select id="convenienceType" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                <option value="">選択してください</option>
+                            </select>
+                        </div>
+                        <button onclick="submitPurchase()" class="w-full btn-gold py-3 px-4 rounded-lg text-white font-bold">
+                            申請
+                        </button>
+                        <button onclick="hidePurchaseForm()" class="w-full mt-2 bg-gray-500 hover:bg-gray-600 py-3 px-4 rounded-lg text-white font-bold">
+                            キャンセル
+                        </button>
+                    </div>
+
+                    <!-- 換金フォーム -->
+                    <div id="withdrawForm" class="bg-white p-6 rounded-lg card-shadow mb-6 hidden">
+                        <h3 class="text-xl font-bold mb-4 gold-text">ポイント換金</h3>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">金額（最低4,000円）</label>
+                            <input type="number" id="withdrawAmount" min="4000" class="w-full px-3 py-2 border gold-border rounded-lg" placeholder="4000">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">出金方法</label>
+                            <select id="withdrawMethod" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                <option value="">選択してください</option>
+                                <option value="paypay">PayPay</option>
+                                <option value="crypto">仮想通貨</option>
+                                <option value="bank">銀行振込</option>
+                            </select>
+                        </div>
+                        <button onclick="submitWithdraw()" class="w-full bg-green-500 hover:bg-green-600 py-3 px-4 rounded-lg text-white font-bold">
+                            申請
+                        </button>
+                        <button onclick="hideWithdrawForm()" class="w-full mt-2 bg-gray-500 hover:bg-gray-600 py-3 px-4 rounded-lg text-white font-bold">
+                            キャンセル
+                        </button>
+                    </div>
+
+                    <!-- 決済情報表示 -->
+                    <div id="paymentInfo" class="bg-white p-6 rounded-lg card-shadow hidden">
+                        <h3 class="text-xl font-bold mb-4 gold-text">決済情報</h3>
+                        <div id="paymentDetails"></div>
+                        <div id="qrCodeContainer" class="qr-container mt-4 hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理画面 -->
+    <div id="adminScreen" class="min-h-screen hidden">
+        <!-- ヘッダー -->
+        <header class="admin-nav p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-crown text-2xl gold-text mr-3"></i>
+                    <h1 class="text-2xl font-bold gold-text">ポイント交換プラットフォーム 管理画面</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">管理者: admin</span>
+                    <button onclick="logout()" class="btn-gold px-4 py-2 rounded-lg">
+                        <i class="fas fa-sign-out-alt mr-2"></i>ログアウト
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ナビゲーション -->
+        <nav class="bg-white border-b-2 border-yellow-400">
+            <div class="container mx-auto">
+                <div class="flex space-x-0">
+                    <button onclick="showTab('dashboard')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400 active">
+                        <i class="fas fa-tachometer-alt mr-2"></i>ダッシュボード
+                    </button>
+                    <button onclick="showTab('applications')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-clipboard-list mr-2"></i>申請管理
+                    </button>
+                    <button onclick="showTab('users')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-users mr-2"></i>ユーザー管理
+                    </button>
+                    <button onclick="showTab('payments')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-credit-card mr-2"></i>決済設定
+                    </button>
+                    <button onclick="showTab('urls')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-link mr-2"></i>URL管理
+                    </button>
+                    <button onclick="showTab('external')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-cog mr-2"></i>外部連携
+                    </button>
+                    <button onclick="showTab('logs')" class="tab-btn px-6 py-3 font-semibold border-b-3 border-transparent hover:border-yellow-400">
+                        <i class="fas fa-file-alt mr-2"></i>ログ管理
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- メインコンテンツ -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- ダッシュボード -->
+            <div id="dashboardTab" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stats-card p-6 rounded-lg card-shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100">
+                                <i class="fas fa-users text-2xl text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-600">総ユーザー数</h3>
+                                <p class="text-3xl font-bold gold-text" id="totalUsers">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6 rounded-lg card-shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <i class="fas fa-plus text-2xl text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-600">購入申請</h3>
+                                <p class="text-3xl font-bold gold-text" id="totalPurchases">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6 rounded-lg card-shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-orange-100">
+                                <i class="fas fa-exchange-alt text-2xl text-orange-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-600">換金申請</h3>
+                                <p class="text-3xl font-bold gold-text" id="totalWithdrawals">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats-card p-6 rounded-lg card-shadow">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100">
+                                <i class="fas fa-coins text-2xl text-purple-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-600">総ポイント流通</h3>
+                                <p class="text-3xl font-bold gold-text" id="totalPoints">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">取引推移</h3>
+                        <canvas id="transactionChart" style="height: 300px;"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">決済方法別割合</h3>
+                        <canvas id="paymentMethodChart" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 申請管理 -->
+            <div id="applicationsTab" class="tab-content hidden">
+                <div class="bg-white rounded-lg card-shadow">
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex">
+                            <button onclick="showApplicationTab('purchase')" class="app-tab-btn px-6 py-3 font-semibold border-b-2 border-transparent hover:border-yellow-400 active">購入申請</button>
+                            <button onclick="showApplicationTab('withdraw')" class="app-tab-btn px-6 py-3 font-semibold border-b-2 border-transparent hover:border-yellow-400">換金申請</button>
+                        </nav>
+                    </div>
+                    <div class="p-6">
+                        <div id="purchaseApplications" class="app-tab-content">
+                            <h3 class="text-xl font-bold mb-4 gold-text">購入申請一覧</h3>
+                            <div id="purchaseList" class="space-y-4"></div>
+                        </div>
+                        <div id="withdrawApplications" class="app-tab-content hidden">
+                            <h3 class="text-xl font-bold mb-4 gold-text">換金申請一覧</h3>
+                            <div id="withdrawList" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ユーザー管理 -->
+            <div id="usersTab" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">新規ユーザー作成</h3>
+                        <form id="userCreateForm">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">電話番号</label>
+                                <input type="tel" id="newUserPhone" class="w-full px-3 py-2 border gold-border rounded-lg" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">パスワード</label>
+                                <input type="password" id="newUserPassword" class="w-full px-3 py-2 border gold-border rounded-lg" required>
+                            </div>
+                            <button type="submit" class="w-full btn-gold py-3 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-user-plus mr-2"></i>ユーザー作成
+                            </button>
+                        </form>
+                        <div class="mt-6">
+                            <h4 class="text-lg font-bold mb-2 gold-text">CSV一括インポート</h4>
+                            <input type="file" id="csvFile" accept=".csv" class="w-full px-3 py-2 border gold-border rounded-lg mb-2">
+                            <button onclick="importCSV()" class="w-full bg-green-500 hover:bg-green-600 py-3 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-file-csv mr-2"></i>CSV インポート
+                            </button>
+                            <p class="text-sm text-gray-600 mt-2">※ A列:電話番号, B列:パスワード</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">ユーザー一覧</h3>
+                        <div id="userList" class="space-y-2 max-h-96 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 決済設定 -->
+            <div id="paymentsTab" class="tab-content hidden">
+                <div class="space-y-6">
+                    <!-- PayPay設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">PayPay設定</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">PayPay ID</label>
+                                <input type="text" id="paypayId" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">PayPay URL</label>
+                                <input type="url" id="paypayUrl" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">QRコード画像URL</label>
+                                <input type="url" id="paypayQR" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">表示設定</label>
+                                <select id="paypayDisplay" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    <option value="true">表示</option>
+                                    <option value="false">非表示</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="savePayPay()" class="mt-4 btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                            <i class="fas fa-save mr-2"></i>保存
+                        </button>
+                    </div>
+
+                    <!-- 仮想通貨設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold gold-text">仮想通貨設定</h3>
+                            <button onclick="addCrypto()" class="btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-plus mr-2"></i>通貨追加
+                            </button>
+                        </div>
+                        <div id="cryptoList" class="space-y-4"></div>
+                    </div>
+
+                    <!-- 銀行振込設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">銀行振込設定</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">銀行名</label>
+                                <input type="text" id="bankName" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">支店名</label>
+                                <input type="text" id="bankBranch" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">口座種別</label>
+                                <select id="bankType" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    <option value="普通">普通</option>
+                                    <option value="当座">当座</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">口座番号</label>
+                                <input type="text" id="bankAccount" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">口座名義</label>
+                                <input type="text" id="bankHolder" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                        </div>
+                        <button onclick="saveBank()" class="mt-4 btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                            <i class="fas fa-save mr-2"></i>保存
+                        </button>
+                    </div>
+
+                    <!-- コンビニ設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold gold-text">コンビニ設定</h3>
+                            <button onclick="addConvenience()" class="btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-plus mr-2"></i>コンビニ追加
+                            </button>
+                        </div>
+                        <div id="convenienceList" class="space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- URL管理 -->
+            <div id="urlsTab" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <div class="mb-6">
+                        <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                            <h4 class="font-bold gold-text mb-2"><i class="fas fa-info-circle mr-2"></i>ユーザーアクセス用URL</h4>
+                            <p class="text-gray-700 mb-2">以下のURLをユーザーに配布してください：</p>
+                            <div class="flex items-center space-x-2">
+                                <input type="text" id="fixedUserURL" class="flex-1 px-3 py-2 border gold-border rounded-lg bg-white" readonly>
+                                <button onclick="copyURL()" class="btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                                    <i class="fas fa-copy mr-2"></i>コピー
+                                </button>
+                                <button onclick="generateQR()" class="bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-lg text-white font-bold">
+                                    <i class="fas fa-qrcode mr-2"></i>QRコード
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="qrDisplay" class="text-center mb-6 hidden">
+                        <h4 class="font-bold gold-text mb-2">QRコード</h4>
+                        <div id="qrCanvas" class="qr-container bg-white p-4 rounded-lg card-shadow inline-block"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 外部連携 -->
+            <div id="externalTab" class="tab-content hidden">
+                <div class="space-y-6">
+                    <!-- Telegram設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">Telegram通知設定</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-semibold mb-3 text-green-600">購入申請用</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">BOT Token</label>
+                                        <input type="text" id="purchaseBotToken" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">チャット/グループID</label>
+                                        <input type="text" id="purchaseChatId" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">スレッドID (オプション)</label>
+                                        <input type="text" id="purchaseThreadId" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">通知文章</label>
+                                        <textarea id="purchaseMessage" rows="3" class="w-full px-3 py-2 border gold-border rounded-lg" placeholder="🔔 新しい購入申請&#10;👤 ユーザー: {phone}&#10;💰 金額: {amount}円&#10;💳 決済方法: {method}&#10;📅 申請日時: {datetime}"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold mb-3 text-orange-600">換金申請用</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">BOT Token</label>
+                                        <input type="text" id="withdrawBotToken" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">チャット/グループID</label>
+                                        <input type="text" id="withdrawChatId" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">スレッドID (オプション)</label>
+                                        <input type="text" id="withdrawThreadId" class="w-full px-3 py-2 border gold-border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-bold mb-2">通知文章</label>
+                                        <textarea id="withdrawMessage" rows="3" class="w-full px-3 py-2 border gold-border rounded-lg" placeholder="🔄 新しい換金申請&#10;👤 ユーザー: {phone}&#10;💰 金額: {amount}円&#10;💳 出金方法: {method}&#10;📅 申請日時: {datetime}"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex space-x-4">
+                            <button onclick="saveTelegram()" class="btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-save mr-2"></i>保存
+                            </button>
+                            <button onclick="testTelegram('purchase')" class="bg-green-500 hover:bg-green-600 py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-paper-plane mr-2"></i>購入用テスト送信
+                            </button>
+                            <button onclick="testTelegram('withdraw')" class="bg-orange-500 hover:bg-orange-600 py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-paper-plane mr-2"></i>換金用テスト送信
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- GAS設定 -->
+                    <div class="bg-white p-6 rounded-lg card-shadow">
+                        <h3 class="text-xl font-bold mb-4 gold-text">Google Apps Script連携設定</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">GAS WebアプリURL</label>
+                                <input type="url" id="gasUrl" class="w-full px-3 py-2 border gold-border rounded-lg" placeholder="https://script.google.com/macros/s/.../exec">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">認証トークン</label>
+                                <input type="text" id="gasToken" class="w-full px-3 py-2 border gold-border rounded-lg">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-4">
+                            <button onclick="saveGAS()" class="btn-gold py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-save mr-2"></i>保存
+                            </button>
+                            <button onclick="testGAS()" class="bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-lg text-white font-bold">
+                                <i class="fas fa-test-tube mr-2"></i>接続テスト
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ログ管理 -->
+            <div id="logsTab" class="tab-content hidden">
+                <div class="bg-white p-6 rounded-lg card-shadow">
+                    <h3 class="text-xl font-bold mb-4 gold-text">システムログ</h3>
+                    <div id="logsList" class="space-y-2 max-h-96 overflow-y-auto bg-gray-50 p-4 rounded-lg"></div>
+                    <button onclick="clearLogs()" class="mt-4 bg-red-500 hover:bg-red-600 py-2 px-4 rounded-lg text-white font-bold">
+                        <i class="fas fa-trash mr-2"></i>ログクリア
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentUser = null;
+        let currentTab = 'dashboard';
+        let currentAppTab = 'purchase';
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+        
+        function initializeApp() {
+            // URLハッシュをチェック
+            if (window.location.hash === '#user') {
+                showUserScreen();
+            } else {
+                showLoginScreen();
+            }
+            
+            // 固定ユーザーURLを設定
+            document.getElementById('fixedUserURL').value = window.location.origin + window.location.pathname + '#user';
+            
+            // デフォルトデータの初期化
+            initializeDefaultData();
+            
+            // イベントリスナーの設定
+            setupEventListeners();
+            
+            // チャートの初期化
+            initializeCharts();
+            
+            // データの読み込み
+            loadAllData();
+        }
+        
+        function initializeDefaultData() {
+            // デフォルト管理者
+            if (!localStorage.getItem('admin')) {
+                localStorage.setItem('admin', JSON.stringify({id: 'admin', password: 'admin123'}));
+            }
+            
+            // デフォルトユーザー
+            if (!localStorage.getItem('users')) {
+                const defaultUser = {
+                    '09012345678': {phone: '09012345678', password: 'user123', points: 0}
+                };
+                localStorage.setItem('users', JSON.stringify(defaultUser));
+            }
+            
+            // デフォルト決済設定
+            initializePaymentSettings();
+        }
+        
+        function initializePaymentSettings() {
+            if (!localStorage.getItem('paypay_settings')) {
+                localStorage.setItem('paypay_settings', JSON.stringify({
+                    id: '', url: '', qr: '', display: 'true'
+                }));
+            }
+            
+            if (!localStorage.getItem('crypto_settings')) {
+                const defaultCrypto = {
+                    'bitcoin': {name: 'Bitcoin', address: '', tag: '', display: 'true'},
+                    'ethereum': {name: 'Ethereum', address: '', tag: '', display: 'true'},
+                    'xrp': {name: 'XRP', address: '', tag: '', display: 'true'}
+                };
+                localStorage.setItem('crypto_settings', JSON.stringify(defaultCrypto));
+            }
+            
+            if (!localStorage.getItem('convenience_settings')) {
+                const defaultConvenience = {
+                    'seven': {name: 'セブンイレブン', code1: '', code2: '', display: 'true'},
+                    'lawson': {name: 'ローソン', code1: '', code2: '', display: 'true'}
+                };
+                localStorage.setItem('convenience_settings', JSON.stringify(defaultConvenience));
+            }
+        }
+        
+        function setupEventListeners() {
+            // ログインフォーム
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                login();
+            });
+            
+            // ユーザー作成フォーム
+            document.getElementById('userCreateForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                createUser();
+            });
+            
+            // ハッシュ変更の監視
+            window.addEventListener('hashchange', function() {
+                if (window.location.hash === '#user') {
+                    showUserScreen();
+                } else {
+                    showLoginScreen();
+                }
+            });
+        }
+        
+        // 画面表示制御
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('userScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+        }
+        
+        function showUserScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('userScreen').classList.remove('hidden');
+            document.getElementById('adminScreen').classList.add('hidden');
+            loadUserPaymentOptions();
+        }
+        
+        function showAdminScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('userScreen').classList.add('hidden');
+            document.getElementById('adminScreen').classList.remove('hidden');
+            loadAllData();
+        }
+        
+        // ログイン機能
+        function login() {
+            const id = document.getElementById('adminId').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            const admin = JSON.parse(localStorage.getItem('admin'));
+            
+            if (id === admin.id && password === admin.password) {
+                showAdminScreen();
+                addLog('管理者ログイン成功', 'success');
+            } else {
+                alert('ログイン情報が正しくありません。');
+                addLog('管理者ログイン失敗', 'error');
+            }
+        }
+        
+        function logout() {
+            showLoginScreen();
+            document.getElementById('adminId').value = '';
+            document.getElementById('adminPassword').value = '';
+            addLog('管理者ログアウト', 'info');
+        }
+        
+        // ユーザーログイン
+        function userLogin() {
+            const phone = document.getElementById('userPhone').value;
+            const password = document.getElementById('userPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[phone] && users[phone].password === password) {
+                currentUser = users[phone];
+                document.getElementById('userLoginForm').classList.add('hidden');
+                document.getElementById('userDashboard').classList.remove('hidden');
+                document.getElementById('userPoints').textContent = (currentUser.points || 0) + ' PT';
+                addLog(`ユーザーログイン: ${phone}`, 'success');
+            } else {
+                alert('ログイン情報が正しくありません。');
+                addLog(`ユーザーログイン失敗: ${phone}`, 'error');
+            }
+        }
+        
+        function userLogout() {
+            currentUser = null;
+            document.getElementById('userLoginForm').classList.remove('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('userPhone').value = '';
+            document.getElementById('userPassword').value = '';
+            hidePurchaseForm();
+            hideWithdrawForm();
+        }
+        
+        // タブ管理
+        function showTab(tabName) {
+            // すべてのタブコンテンツを隠す
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // すべてのタブボタンからactiveクラスを削除
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-yellow-400');
+                btn.classList.add('border-transparent');
+            });
+            
+            // 選択されたタブを表示
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+            
+            // 選択されたタブボタンにactiveクラスを追加
+            event.target.classList.add('active', 'border-yellow-400');
+            event.target.classList.remove('border-transparent');
+            
+            currentTab = tabName;
+            
+            // タブ固有の処理
+            if (tabName === 'dashboard') {
+                updateDashboard();
+                updateCharts();
+            } else if (tabName === 'applications') {
+                loadApplications();
+            } else if (tabName === 'users') {
+                loadUserList();
+            } else if (tabName === 'payments') {
+                loadPaymentSettings();
+            }
+        }
+        
+        function showApplicationTab(tabName) {
+            document.querySelectorAll('.app-tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            document.querySelectorAll('.app-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'border-yellow-400');
+                btn.classList.add('border-transparent');
+            });
+            
+            document.getElementById(tabName + 'Applications').classList.remove('hidden');
+            event.target.classList.add('active', 'border-yellow-400');
+            event.target.classList.remove('border-transparent');
+            
+            currentAppTab = tabName;
+            loadApplications();
+        }
+        
+        // ユーザー管理
+        function createUser() {
+            const phone = document.getElementById('newUserPhone').value;
+            const password = document.getElementById('newUserPassword').value;
+            
+            if (!phone || !password) {
+                alert('電話番号とパスワードを入力してください。');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[phone]) {
+                alert('この電話番号は既に登録されています。');
+                return;
+            }
+            
+            users[phone] = {
+                phone: phone,
+                password: password,
+                points: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            document.getElementById('newUserPhone').value = '';
+            document.getElementById('newUserPassword').value = '';
+            
+            loadUserList();
+            updateDashboard();
+            addLog(`ユーザー作成: ${phone}`, 'success');
+            
+            alert('ユーザーが作成されました。');
+        }
+        
+        function importCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('CSVファイルを選択してください。');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const lines = csv.split('\n');
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                let importCount = 0;
+                
+                for (let i = 1; i < lines.length; i++) { // ヘッダーをスキップ
+                    const line = lines[i].trim();
+                    if (line) {
+                        const [phone, password] = line.split(',');
+                        if (phone && password && !users[phone]) {
+                            users[phone] = {
+                                phone: phone,
+                                password: password,
+                                points: 0,
+                                createdAt: new Date().toISOString()
+                            };
+                            importCount++;
+                        }
+                    }
+                }
+                
+                localStorage.setItem('users', JSON.stringify(users));
+                fileInput.value = '';
+                loadUserList();
+                updateDashboard();
+                addLog(`CSV一括インポート: ${importCount}件`, 'success');
+                alert(`${importCount}件のユーザーをインポートしました。`);
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function loadUserList() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            Object.values(users).forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                userDiv.innerHTML = `
+                    <div>
+                        <span class="font-semibold">${user.phone}</span>
+                        <span class="text-sm text-gray-600 ml-2">${user.points || 0} PT</span>
+                    </div>
+                    <div class="space-x-2">
+                        <button onclick="resetUserPassword('${user.phone}')" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-key"></i> パスワードリセット
+                        </button>
+                        <button onclick="deleteUser('${user.phone}')" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i> 削除
+                        </button>
+                    </div>
+                `;
+                userList.appendChild(userDiv);
+            });
+        }
+        
+        function resetUserPassword(phone) {
+            const newPassword = prompt('新しいパスワードを入力してください:');
+            if (newPassword) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                if (users[phone]) {
+                    users[phone].password = newPassword;
+                    localStorage.setItem('users', JSON.stringify(users));
+                    addLog(`パスワードリセット: ${phone}`, 'info');
+                    alert('パスワードを更新しました。');
+                }
+            }
+        }
+        
+        function deleteUser(phone) {
+            if (confirm('このユーザーを削除しますか？')) {
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                delete users[phone];
+                localStorage.setItem('users', JSON.stringify(users));
+                loadUserList();
+                updateDashboard();
+                addLog(`ユーザー削除: ${phone}`, 'info');
+                alert('ユーザーを削除しました。');
+            }
+        }
+        
+        // 決済設定管理
+        function loadPaymentSettings() {
+            // PayPay設定
+            const paypay = JSON.parse(localStorage.getItem('paypay_settings') || '{}');
+            document.getElementById('paypayId').value = paypay.id || '';
+            document.getElementById('paypayUrl').value = paypay.url || '';
+            document.getElementById('paypayQR').value = paypay.qr || '';
+            document.getElementById('paypayDisplay').value = paypay.display || 'true';
+            
+            // 銀行設定
+            const bank = JSON.parse(localStorage.getItem('bank_settings') || '{}');
+            document.getElementById('bankName').value = bank.name || '';
+            document.getElementById('bankBranch').value = bank.branch || '';
+            document.getElementById('bankType').value = bank.type || '普通';
+            document.getElementById('bankAccount').value = bank.account || '';
+            document.getElementById('bankHolder').value = bank.holder || '';
+            
+            // 仮想通貨設定
+            loadCryptoSettings();
+            
+            // コンビニ設定
+            loadConvenienceSettings();
+            
+            // Telegram設定
+            const telegram = JSON.parse(localStorage.getItem('telegram_settings') || '{}');
+            document.getElementById('purchaseBotToken').value = telegram.purchase?.botToken || '';
+            document.getElementById('purchaseChatId').value = telegram.purchase?.chatId || '';
+            document.getElementById('purchaseThreadId').value = telegram.purchase?.threadId || '';
+            document.getElementById('purchaseMessage').value = telegram.purchase?.message || '';
+            document.getElementById('withdrawBotToken').value = telegram.withdraw?.botToken || '';
+            document.getElementById('withdrawChatId').value = telegram.withdraw?.chatId || '';
+            document.getElementById('withdrawThreadId').value = telegram.withdraw?.threadId || '';
+            document.getElementById('withdrawMessage').value = telegram.withdraw?.message || '';
+            
+            // GAS設定
+            const gas = JSON.parse(localStorage.getItem('gas_settings') || '{}');
+            document.getElementById('gasUrl').value = gas.url || '';
+            document.getElementById('gasToken').value = gas.token || '';
+        }
+        
+        function savePayPay() {
+            const settings = {
+                id: document.getElementById('paypayId').value,
+                url: document.getElementById('paypayUrl').value,
+                qr: document.getElementById('paypayQR').value,
+                display: document.getElementById('paypayDisplay').value
+            };
+            
+            localStorage.setItem('paypay_settings', JSON.stringify(settings));
+            addLog('PayPay設定保存', 'success');
+            alert('PayPay設定を保存しました。');
+        }
+        
+        function saveBank() {
+            const settings = {
+                name: document.getElementById('bankName').value,
+                branch: document.getElementById('bankBranch').value,
+                type: document.getElementById('bankType').value,
+                account: document.getElementById('bankAccount').value,
+                holder: document.getElementById('bankHolder').value
+            };
+            
+            localStorage.setItem('bank_settings', JSON.stringify(settings));
+            addLog('銀行設定保存', 'success');
+            alert('銀行設定を保存しました。');
+        }
+        
+        function loadCryptoSettings() {
+            const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+            const cryptoList = document.getElementById('cryptoList');
+            cryptoList.innerHTML = '';
+            
+            Object.entries(cryptoSettings).forEach(([key, crypto]) => {
+                const cryptoDiv = document.createElement('div');
+                cryptoDiv.className = 'border gold-border p-4 rounded-lg';
+                cryptoDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">通貨名</label>
+                            <input type="text" value="${crypto.name || ''}" onchange="updateCrypto('${key}', 'name', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">ウォレットアドレス</label>
+                            <input type="text" value="${crypto.address || ''}" onchange="updateCrypto('${key}', 'address', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">タグ (XRP等)</label>
+                            <input type="text" value="${crypto.tag || ''}" onchange="updateCrypto('${key}', 'tag', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">表示設定</label>
+                            <div class="flex items-center space-x-4">
+                                <select onchange="updateCrypto('${key}', 'display', this.value)" class="flex-1 px-3 py-2 border gold-border rounded-lg">
+                                    <option value="true" ${crypto.display === 'true' ? 'selected' : ''}>表示</option>
+                                    <option value="false" ${crypto.display === 'false' ? 'selected' : ''}>非表示</option>
+                                </select>
+                                <button onclick="deleteCrypto('${key}')" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                cryptoList.appendChild(cryptoDiv);
+            });
+        }
+        
+        function addCrypto() {
+            const name = prompt('通貨名を入力してください:');
+            if (name) {
+                const key = 'crypto_' + Date.now();
+                const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+                cryptoSettings[key] = {
+                    name: name,
+                    address: '',
+                    tag: '',
+                    display: 'true'
+                };
+                localStorage.setItem('crypto_settings', JSON.stringify(cryptoSettings));
+                loadCryptoSettings();
+                addLog(`仮想通貨追加: ${name}`, 'success');
+            }
+        }
+        
+        function updateCrypto(key, field, value) {
+            const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+            if (cryptoSettings[key]) {
+                cryptoSettings[key][field] = value;
+                localStorage.setItem('crypto_settings', JSON.stringify(cryptoSettings));
+            }
+        }
+        
+        function deleteCrypto(key) {
+            if (confirm('この仮想通貨設定を削除しますか？')) {
+                const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+                delete cryptoSettings[key];
+                localStorage.setItem('crypto_settings', JSON.stringify(cryptoSettings));
+                loadCryptoSettings();
+                addLog(`仮想通貨削除: ${key}`, 'info');
+            }
+        }
+        
+        function loadConvenienceSettings() {
+            const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+            const convenienceList = document.getElementById('convenienceList');
+            convenienceList.innerHTML = '';
+            
+            Object.entries(convenienceSettings).forEach(([key, convenience]) => {
+                const convenienceDiv = document.createElement('div');
+                convenienceDiv.className = 'border gold-border p-4 rounded-lg';
+                convenienceDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">コンビニ名</label>
+                            <input type="text" value="${convenience.name || ''}" onchange="updateConvenience('${key}', 'name', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">コード1</label>
+                            <input type="text" value="${convenience.code1 || ''}" onchange="updateConvenience('${key}', 'code1', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">コード2</label>
+                            <input type="text" value="${convenience.code2 || ''}" onchange="updateConvenience('${key}', 'code2', this.value)" class="w-full px-3 py-2 border gold-border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">表示設定</label>
+                            <div class="flex items-center space-x-4">
+                                <select onchange="updateConvenience('${key}', 'display', this.value)" class="flex-1 px-3 py-2 border gold-border rounded-lg">
+                                    <option value="true" ${convenience.display === 'true' ? 'selected' : ''}>表示</option>
+                                    <option value="false" ${convenience.display === 'false' ? 'selected' : ''}>非表示</option>
+                                </select>
+                                <button onclick="deleteConvenience('${key}')" class="text-red-500 hover:text-red-700">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                convenienceList.appendChild(convenienceDiv);
+            });
+        }
+        
+        function addConvenience() {
+            const name = prompt('コンビニ名を入力してください:');
+            if (name) {
+                const key = 'convenience_' + Date.now();
+                const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+                convenienceSettings[key] = {
+                    name: name,
+                    code1: '',
+                    code2: '',
+                    display: 'true'
+                };
+                localStorage.setItem('convenience_settings', JSON.stringify(convenienceSettings));
+                loadConvenienceSettings();
+                addLog(`コンビニ追加: ${name}`, 'success');
+            }
+        }
+        
+        function updateConvenience(key, field, value) {
+            const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+            if (convenienceSettings[key]) {
+                convenienceSettings[key][field] = value;
+                localStorage.setItem('convenience_settings', JSON.stringify(convenienceSettings));
+            }
+        }
+        
+        function deleteConvenience(key) {
+            if (confirm('このコンビニ設定を削除しますか？')) {
+                const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+                delete convenienceSettings[key];
+                localStorage.setItem('convenience_settings', JSON.stringify(convenienceSettings));
+                loadConvenienceSettings();
+                addLog(`コンビニ削除: ${key}`, 'info');
+            }
+        }
+        
+        // Telegram設定
+        function saveTelegram() {
+            const settings = {
+                purchase: {
+                    botToken: document.getElementById('purchaseBotToken').value,
+                    chatId: document.getElementById('purchaseChatId').value,
+                    threadId: document.getElementById('purchaseThreadId').value,
+                    message: document.getElementById('purchaseMessage').value
+                },
+                withdraw: {
+                    botToken: document.getElementById('withdrawBotToken').value,
+                    chatId: document.getElementById('withdrawChatId').value,
+                    threadId: document.getElementById('withdrawThreadId').value,
+                    message: document.getElementById('withdrawMessage').value
+                }
+            };
+            
+            localStorage.setItem('telegram_settings', JSON.stringify(settings));
+            addLog('Telegram設定保存', 'success');
+            alert('Telegram設定を保存しました。');
+        }
+        
+        function testTelegram(type) {
+            const settings = JSON.parse(localStorage.getItem('telegram_settings') || '{}');
+            const config = settings[type];
+            
+            if (!config || !config.botToken || !config.chatId) {
+                alert('Telegram設定が不完全です。');
+                return;
+            }
+            
+            const message = `🧪 テスト通知 (${type === 'purchase' ? '購入' : '換金'}用)\n📅 ${new Date().toLocaleString()}`;
+            
+            sendTelegramMessage(config, message)
+                .then(() => {
+                    alert('テスト送信が完了しました。');
+                    addLog(`Telegramテスト送信成功: ${type}`, 'success');
+                })
+                .catch(error => {
+                    alert('送信に失敗しました: ' + error);
+                    addLog(`Telegramテスト送信失敗: ${type} - ${error}`, 'error');
+                });
+        }
+        
+        function sendTelegramMessage(config, message) {
+            const url = `https://api.telegram.org/bot${config.botToken}/sendMessage`;
+            const data = {
+                chat_id: config.chatId,
+                text: message,
+                ...(config.threadId && { message_thread_id: config.threadId })
+            };
+            
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('送信失敗');
+                }
+                return response.json();
+            });
+        }
+        
+        // GAS設定
+        function saveGAS() {
+            const settings = {
+                url: document.getElementById('gasUrl').value,
+                token: document.getElementById('gasToken').value
+            };
+            
+            localStorage.setItem('gas_settings', JSON.stringify(settings));
+            addLog('GAS設定保存', 'success');
+            alert('GAS設定を保存しました。');
+        }
+        
+        function testGAS() {
+            const settings = JSON.parse(localStorage.getItem('gas_settings') || '{}');
+            
+            if (!settings.url) {
+                alert('GAS URLが設定されていません。');
+                return;
+            }
+            
+            const testData = {
+                type: 'test',
+                timestamp: new Date().toISOString(),
+                token: settings.token
+            };
+            
+            fetch(settings.url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert('接続テスト完了: ' + result);
+                addLog('GAS接続テスト成功', 'success');
+            })
+            .catch(error => {
+                alert('接続テストに失敗しました: ' + error);
+                addLog('GAS接続テスト失敗: ' + error, 'error');
+            });
+        }
+        
+        // URL管理
+        function copyURL() {
+            const urlInput = document.getElementById('fixedUserURL');
+            urlInput.select();
+            document.execCommand('copy');
+            alert('URLをコピーしました。');
+            addLog('ユーザーURLコピー', 'info');
+        }
+        
+        function generateQR() {
+            const url = document.getElementById('fixedUserURL').value;
+            const qrCanvas = document.getElementById('qrCanvas');
+            const qrDisplay = document.getElementById('qrDisplay');
+            
+            qrCanvas.innerHTML = '';
+            
+            QRCode.toCanvas(qrCanvas, url, {
+                width: 200,
+                margin: 2
+            }, function (error) {
+                if (error) {
+                    console.error(error);
+                    alert('QRコードの生成に失敗しました。');
+                } else {
+                    qrDisplay.classList.remove('hidden');
+                    addLog('QRコード生成', 'info');
+                }
+            });
+        }
+        
+        // ユーザー画面での購入・換金
+        function loadUserPaymentOptions() {
+            // 仮想通貨オプション
+            const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+            const cryptoSelect = document.getElementById('cryptoType');
+            cryptoSelect.innerHTML = '<option value="">選択してください</option>';
+            
+            Object.entries(cryptoSettings).forEach(([key, crypto]) => {
+                if (crypto.display === 'true') {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = crypto.name;
+                    cryptoSelect.appendChild(option);
+                }
+            });
+            
+            // コンビニオプション
+            const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+            const convenienceSelect = document.getElementById('convenienceType');
+            convenienceSelect.innerHTML = '<option value="">選択してください</option>';
+            
+            Object.entries(convenienceSettings).forEach(([key, convenience]) => {
+                if (convenience.display === 'true') {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = convenience.name;
+                    convenienceSelect.appendChild(option);
+                }
+            });
+        }
+        
+        function showPurchaseForm() {
+            document.getElementById('purchaseForm').classList.remove('hidden');
+            hideWithdrawForm();
+            document.getElementById('paymentInfo').classList.add('hidden');
+        }
+        
+        function hidePurchaseForm() {
+            document.getElementById('purchaseForm').classList.add('hidden');
+            document.getElementById('paymentInfo').classList.add('hidden');
+        }
+        
+        function showWithdrawForm() {
+            document.getElementById('withdrawForm').classList.remove('hidden');
+            hidePurchaseForm();
+            document.getElementById('paymentInfo').classList.add('hidden');
+        }
+        
+        function hideWithdrawForm() {
+            document.getElementById('withdrawForm').classList.add('hidden');
+            document.getElementById('paymentInfo').classList.add('hidden');
+        }
+        
+        function showPaymentInfo() {
+            const method = document.getElementById('purchaseMethod').value;
+            const cryptoSelect = document.getElementById('cryptoSelect');
+            const convenienceSelect = document.getElementById('convenienceSelect');
+            
+            cryptoSelect.classList.add('hidden');
+            convenienceSelect.classList.add('hidden');
+            
+            if (method === 'crypto') {
+                cryptoSelect.classList.remove('hidden');
+            } else if (method === 'convenience') {
+                convenienceSelect.classList.remove('hidden');
+            }
+        }
+        
+        function submitPurchase() {
+            const amount = parseInt(document.getElementById('purchaseAmount').value);
+            const method = document.getElementById('purchaseMethod').value;
+            
+            if (!amount || amount < 2000) {
+                alert('2,000円以上の金額を入力してください。');
+                return;
+            }
+            
+            if (!method) {
+                alert('決済方法を選択してください。');
+                return;
+            }
+            
+            if (method === 'crypto' && !document.getElementById('cryptoType').value) {
+                alert('仮想通貨を選択してください。');
+                return;
+            }
+            
+            if (method === 'convenience' && !document.getElementById('convenienceType').value) {
+                alert('コンビニを選択してください。');
+                return;
+            }
+            
+            // 申請を作成
+            const application = {
+                id: 'purchase_' + Date.now(),
+                type: 'purchase',
+                user: currentUser.phone,
+                amount: amount,
+                method: method,
+                cryptoType: method === 'crypto' ? document.getElementById('cryptoType').value : null,
+                convenienceType: method === 'convenience' ? document.getElementById('convenienceType').value : null,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            // 申請を保存
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            
+            // 決済情報を表示
+            displayPaymentInfo(application);
+            
+            // Telegram通知
+            sendPurchaseNotification(application);
+            
+            // GASに送信
+            sendToGAS(application);
+            
+            addLog(`購入申請: ${currentUser.phone} - ${amount}円`, 'success');
+            alert('購入申請を送信しました。決済情報をご確認ください。');
+        }
+        
+        function submitWithdraw() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            
+            if (!amount || amount < 4000) {
+                alert('4,000円以上の金額を入力してください。');
+                return;
+            }
+            
+            if (!method) {
+                alert('出金方法を選択してください。');
+                return;
+            }
+            
+            if (amount > (currentUser.points || 0)) {
+                alert('ポイント残高が不足しています。');
+                return;
+            }
+            
+            // 申請を作成
+            const application = {
+                id: 'withdraw_' + Date.now(),
+                type: 'withdraw',
+                user: currentUser.phone,
+                amount: amount,
+                method: method,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            // 申請を保存
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+            
+            hideWithdrawForm();
+            
+            // Telegram通知
+            sendWithdrawNotification(application);
+            
+            // GASに送信
+            sendToGAS(application);
+            
+            addLog(`換金申請: ${currentUser.phone} - ${amount}円`, 'success');
+            alert('換金申請を送信しました。処理をお待ちください。');
+        }
+        
+        function displayPaymentInfo(application) {
+            const paymentDetails = document.getElementById('paymentDetails');
+            const qrContainer = document.getElementById('qrCodeContainer');
+            let html = '';
+            
+            switch (application.method) {
+                case 'paypay':
+                    const paypay = JSON.parse(localStorage.getItem('paypay_settings') || '{}');
+                    html = `
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">PayPay ID:</span>
+                                <span class="flex items-center">
+                                    ${paypay.id || 'N/A'}
+                                    <button onclick="copyToClipboard('${paypay.id}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            ${paypay.url ? `
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">PayPay URL:</span>
+                                    <a href="${paypay.url}" target="_blank" class="text-blue-500 hover:underline">
+                                        PayPayで開く <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            ` : ''}
+                            <div class="flex justify-between">
+                                <span class="font-semibold">金額:</span>
+                                <span class="flex items-center">
+                                    ${application.amount.toLocaleString()}円
+                                    <button onclick="copyToClipboard('${application.amount}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    if (paypay.qr) {
+                        qrContainer.innerHTML = `<img src="${paypay.qr}" alt="PayPay QR" class="max-w-full">`;
+                        qrContainer.classList.remove('hidden');
+                    }
+                    break;
+                    
+                case 'crypto':
+                    const cryptoSettings = JSON.parse(localStorage.getItem('crypto_settings') || '{}');
+                    const crypto = cryptoSettings[application.cryptoType];
+                    if (crypto) {
+                        html = `
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">通貨:</span>
+                                    <span>${crypto.name}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">アドレス:</span>
+                                    <span class="flex items-center">
+                                        ${crypto.address.substring(0, 20)}...
+                                        <button onclick="copyToClipboard('${crypto.address}')" class="ml-2 text-blue-500">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                                ${crypto.tag ? `
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold">タグ:</span>
+                                        <span class="flex items-center">
+                                            ${crypto.tag}
+                                            <button onclick="copyToClipboard('${crypto.tag}')" class="ml-2 text-blue-500">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                ` : ''}
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">金額:</span>
+                                    <span class="flex items-center">
+                                        ${application.amount.toLocaleString()}円
+                                        <button onclick="copyToClipboard('${application.amount}')" class="ml-2 text-blue-500">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                        // QRコード生成（アドレス用）
+                        generateCryptoQR(crypto.address, crypto.tag);
+                    }
+                    break;
+                    
+                case 'bank':
+                    const bank = JSON.parse(localStorage.getItem('bank_settings') || '{}');
+                    html = `
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="font-semibold">銀行名:</span>
+                                <span class="flex items-center">
+                                    ${bank.name || 'N/A'}
+                                    <button onclick="copyToClipboard('${bank.name}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">支店名:</span>
+                                <span class="flex items-center">
+                                    ${bank.branch || 'N/A'}
+                                    <button onclick="copyToClipboard('${bank.branch}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">口座種別:</span>
+                                <span>${bank.type || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">口座番号:</span>
+                                <span class="flex items-center">
+                                    ${bank.account || 'N/A'}
+                                    <button onclick="copyToClipboard('${bank.account}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">口座名義:</span>
+                                <span class="flex items-center">
+                                    ${bank.holder || 'N/A'}
+                                    <button onclick="copyToClipboard('${bank.holder}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold">金額:</span>
+                                <span class="flex items-center">
+                                    ${application.amount.toLocaleString()}円
+                                    <button onclick="copyToClipboard('${application.amount}')" class="ml-2 text-blue-500">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'convenience':
+                    const convenienceSettings = JSON.parse(localStorage.getItem('convenience_settings') || '{}');
+                    const convenience = convenienceSettings[application.convenienceType];
+                    if (convenience) {
+                        html = `
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">コンビニ:</span>
+                                    <span>${convenience.name}</span>
+                                </div>
+                                ${convenience.code1 ? `
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold">コード1:</span>
+                                        <span class="flex items-center">
+                                            ${convenience.code1}
+                                            <button onclick="copyToClipboard('${convenience.code1}')" class="ml-2 text-blue-500">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                ` : ''}
+                                ${convenience.code2 ? `
+                                    <div class="flex justify-between">
+                                        <span class="font-semibold">コード2:</span>
+                                        <span class="flex items-center">
+                                            ${convenience.code2}
+                                            <button onclick="copyToClipboard('${convenience.code2}')" class="ml-2 text-blue-500">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                ` : ''}
+                                <div class="flex justify-between">
+                                    <span class="font-semibold">金額:</span>
+                                    <span class="flex items-center">
+                                        ${application.amount.toLocaleString()}円
+                                        <button onclick="copyToClipboard('${application.amount}')" class="ml-2 text-blue-500">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    break;
+            }
+            
+            paymentDetails.innerHTML = html;
+            document.getElementById('paymentInfo').classList.remove('hidden');
+        }
+        
+        function generateCryptoQR(address, tag) {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            const qrData = tag ? `${address}?tag=${tag}` : address;
+            
+            qrContainer.innerHTML = '';
+            QRCode.toCanvas(qrContainer, qrData, {
+                width: 200,
+                margin: 2
+            }, function (error) {
+                if (!error) {
+                    qrContainer.classList.remove('hidden');
+                }
+            });
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('コピーしました: ' + text);
+            });
+        }
+        
+        function sendPurchaseNotification(application) {
+            const settings = JSON.parse(localStorage.getItem('telegram_settings') || '{}');
+            if (settings.purchase && settings.purchase.botToken && settings.purchase.chatId) {
+                let message = settings.purchase.message || '🔔 新しい購入申請\n👤 ユーザー: {phone}\n💰 金額: {amount}円\n💳 決済方法: {method}\n📅 申請日時: {datetime}';
+                
+                message = message
+                    .replace('{phone}', application.user)
+                    .replace('{amount}', application.amount.toLocaleString())
+                    .replace('{method}', getMethodName(application.method))
+                    .replace('{datetime}', new Date(application.createdAt).toLocaleString());
+                
+                sendTelegramMessage(settings.purchase, message)
+                    .catch(error => console.error('Telegram送信失敗:', error));
+            }
+        }
+        
+        function sendWithdrawNotification(application) {
+            const settings = JSON.parse(localStorage.getItem('telegram_settings') || '{}');
+            if (settings.withdraw && settings.withdraw.botToken && settings.withdraw.chatId) {
+                let message = settings.withdraw.message || '🔄 新しい換金申請\n👤 ユーザー: {phone}\n💰 金額: {amount}円\n💳 出金方法: {method}\n📅 申請日時: {datetime}';
+                
+                message = message
+                    .replace('{phone}', application.user)
+                    .replace('{amount}', application.amount.toLocaleString())
+                    .replace('{method}', getMethodName(application.method))
+                    .replace('{datetime}', new Date(application.createdAt).toLocaleString());
+                
+                sendTelegramMessage(settings.withdraw, message)
+                    .catch(error => console.error('Telegram送信失敗:', error));
+            }
+        }
+        
+        function getMethodName(method) {
+            const methods = {
+                'paypay': 'PayPay',
+                'crypto': '仮想通貨',
+                'bank': '銀行振込',
+                'convenience': 'コンビニ決済'
+            };
+            return methods[method] || method;
+        }
+        
+        function sendToGAS(application) {
+            const settings = JSON.parse(localStorage.getItem('gas_settings') || '{}');
+            if (settings.url) {
+                const data = {
+                    type: application.type,
+                    user: application.user,
+                    amount: application.amount,
+                    method: application.method,
+                    status: application.status,
+                    createdAt: application.createdAt,
+                    token: settings.token
+                };
+                
+                fetch(settings.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                }).catch(error => console.error('GAS送信失敗:', error));
+            }
+        }
+        
+        // 申請管理
+        function loadApplications() {
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            
+            if (currentAppTab === 'purchase') {
+                const purchaseApps = applications.filter(app => app.type === 'purchase');
+                displayApplications(purchaseApps, 'purchaseList');
+            } else {
+                const withdrawApps = applications.filter(app => app.type === 'withdraw');
+                displayApplications(withdrawApps, 'withdrawList');
+            }
+        }
+        
+        function displayApplications(applications, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (applications.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">申請がありません</p>';
+                return;
+            }
+            
+            applications.reverse().forEach(app => {
+                const appDiv = document.createElement('div');
+                appDiv.className = 'border gold-border p-4 rounded-lg bg-gray-50';
+                
+                const statusColor = {
+                    'pending': 'bg-yellow-100 text-yellow-800',
+                    'approved': 'bg-green-100 text-green-800',
+                    'completed': 'bg-blue-100 text-blue-800',
+                    'cancelled': 'bg-red-100 text-red-800'
+                };
+                
+                const statusText = {
+                    'pending': '申請中',
+                    'approved': '承認済み',
+                    'completed': '完了',
+                    'cancelled': 'キャンセル'
+                };
+                
+                appDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-semibold">${app.user}</h4>
+                            <p class="text-sm text-gray-600">${new Date(app.createdAt).toLocaleString()}</p>
+                        </div>
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${statusColor[app.status]}">${statusText[app.status]}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <span class="text-sm text-gray-600">金額:</span>
+                            <span class="font-semibold">${app.amount.toLocaleString()}円</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">方法:</span>
+                            <span class="font-semibold">${getMethodName(app.method)}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        ${app.status === 'pending' ? `
+                            <button onclick="updateApplicationStatus('${app.id}', 'approved')" class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm">
+                                承認
+                            </button>
+                            <button onclick="updateApplicationStatus('${app.id}', 'cancelled')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">
+                                キャンセル
+                            </button>
+                        ` : ''}
+                        ${app.status === 'approved' ? `
+                            <button onclick="updateApplicationStatus('${app.id}', 'completed')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                完了
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(appDiv);
+            });
+        }
+        
+        function updateApplicationStatus(id, status) {
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            const application = applications.find(app => app.id === id);
+            
+            if (application) {
+                application.status = status;
+                application.updatedAt = new Date().toISOString();
+                
+                // ポイント更新処理
+                if (application.type === 'purchase' && status === 'completed') {
+                    const users = JSON.parse(localStorage.getItem('users') || '{}');
+                    if (users[application.user]) {
+                        users[application.user].points = (users[application.user].points || 0) + application.amount;
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                } else if (application.type === 'withdraw' && status === 'completed') {
+                    const users = JSON.parse(localStorage.getItem('users') || '{}');
+                    if (users[application.user]) {
+                        users[application.user].points = Math.max(0, (users[application.user].points || 0) - application.amount);
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                }
+                
+                localStorage.setItem('applications', JSON.stringify(applications));
+                loadApplications();
+                updateDashboard();
+                addLog(`申請ステータス更新: ${id} -> ${status}`, 'info');
+            }
+        }
+        
+        // ダッシュボード更新
+        function updateDashboard() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            
+            document.getElementById('totalUsers').textContent = Object.keys(users).length;
+            document.getElementById('totalPurchases').textContent = applications.filter(app => app.type === 'purchase').length;
+            document.getElementById('totalWithdrawals').textContent = applications.filter(app => app.type === 'withdraw').length;
+            
+            const totalPoints = Object.values(users).reduce((sum, user) => sum + (user.points || 0), 0);
+            document.getElementById('totalPoints').textContent = totalPoints.toLocaleString();
+        }
+        
+        function initializeCharts() {
+            // 取引推移チャート
+            const transactionCtx = document.getElementById('transactionChart').getContext('2d');
+            window.transactionChart = new Chart(transactionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '購入申請',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: '換金申請',
+                        data: [2, 3, 20, 5, 1, 4],
+                        borderColor: '#F59E0B',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 決済方法別割合チャート
+            const paymentMethodCtx = document.getElementById('paymentMethodChart').getContext('2d');
+            window.paymentMethodChart = new Chart(paymentMethodCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['PayPay', '仮想通貨', '銀行振込', 'コンビニ'],
+                    datasets: [{
+                        data: [30, 25, 25, 20],
+                        backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateCharts() {
+            const applications = JSON.parse(localStorage.getItem('applications') || '[]');
+            
+            // 決済方法別データ更新
+            const methodCounts = {
+                'paypay': 0,
+                'crypto': 0,
+                'bank': 0,
+                'convenience': 0
+            };
+            
+            applications.forEach(app => {
+                if (methodCounts[app.method] !== undefined) {
+                    methodCounts[app.method]++;
+                }
+            });
+            
+            const total = Object.values(methodCounts).reduce((sum, count) => sum + count, 0);
+            if (total > 0) {
+                window.paymentMethodChart.data.datasets[0].data = [
+                    (methodCounts.paypay / total) * 100,
+                    (methodCounts.crypto / total) * 100,
+                    (methodCounts.bank / total) * 100,
+                    (methodCounts.convenience / total) * 100
+                ];
+                window.paymentMethodChart.update();
+            }
+        }
+        
+        function loadAllData() {
+            updateDashboard();
+            loadUserList();
+            loadPaymentSettings();
+        }
+        
+        // ログ管理
+        function addLog(message, type = 'info') {
+            const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+            const log = {
+                id: Date.now(),
+                message: message,
+                type: type,
+                timestamp: new Date().toISOString()
+            };
+            
+            logs.unshift(log); // 最新を先頭に
+            if (logs.length > 1000) {
+                logs.splice(1000); // 1000件まで保持
+            }
+            
+            localStorage.setItem('logs', JSON.stringify(logs));
+            
+            // ログタブがアクティブな場合は更新
+            if (currentTab === 'logs') {
+                loadLogs();
+            }
+        }
+        
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+            const logsList = document.getElementById('logsList');
+            logsList.innerHTML = '';
+            
+            if (logs.length === 0) {
+                logsList.innerHTML = '<p class="text-gray-500 text-center py-4">ログがありません</p>';
+                return;
+            }
+            
+            logs.slice(0, 100).forEach(log => { // 最新100件を表示
+                const logDiv = document.createElement('div');
+                logDiv.className = 'flex justify-between items-center p-2 border-b border-gray-200';
+                
+                const typeColor = {
+                    'success': 'text-green-600',
+                    'error': 'text-red-600',
+                    'warning': 'text-yellow-600',
+                    'info': 'text-blue-600'
+                };
+                
+                logDiv.innerHTML = `
+                    <div class="flex-1">
+                        <span class="${typeColor[log.type] || 'text-gray-600'}">${log.message}</span>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        ${new Date(log.timestamp).toLocaleString()}
+                    </div>
+                `;
+                
+                logsList.appendChild(logDiv);
+            });
+        }
+        
+        function clearLogs() {
+            if (confirm('すべてのログを削除しますか？')) {
+                localStorage.setItem('logs', JSON.stringify([]));
+                loadLogs();
+                alert('ログを削除しました。');
+            }
+        }
+    </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"96f9cf170f37b829","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}},"version":"2025.8.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
+    <script id="html_badge_script1">
+        window.__genspark_remove_badge_link = "https://www.genspark.ai/api/html_badge/" +
+            "remove_badge?token=To%2FBnjzloZ3UfQdcSaYfDrPhSQI4r78sRe6ZZsALMsQhdA3auE8xpgBgacHm165ODO6u3%2F823LzfMW8ddyyL9VqDp9TIpKS8NbxEqMTK0aUWoH%2BQTXgKrRBPBiTe3peJbJaVL0Zk%2BUyyz0guLic1nAL5G4CCw7FmN%2Fz7GJ49LrQUJGtbo5pCYP%2FM3ONVgkHS2wjTdKVwc%2Fkzd6htcuIgPNk9GHI0PxRNjpV9fBJzY8cGjsI43qZIdgH4QL4MEV1hjM98XrzVFz%2FIjOPS36RvUkJhyZc8HVLbYfq6sE93OzXb%2BQRym%2FHeTNU5TOqe02MFa%2FJqpqmdJcYIXicpr4dSWcWXofy7496f4b4QEWMMcw36hLFp06%2B41JlmhDVJTDXMLgbNrsAynm5bjZhNw3RxhYrkPkGhBCa62xnqISFTOLEDJ8MsMAWPJLmbKOYBmHbxJ0ALUwNmbpMA7jL9N1qyfquxUfF0DBhLHVjkKHZUYpVkouop4hT9uQeoFm7q7nyXVZ%2ByWJyFkzn5aoUM%2FdE7NQX8D8dpe6YHWpcR2%2BcMmyM%3D";
+        window.__genspark_locale = "ja-JP";
+        window.__genspark_token = "To/BnjzloZ3UfQdcSaYfDrPhSQI4r78sRe6ZZsALMsQhdA3auE8xpgBgacHm165ODO6u3/823LzfMW8ddyyL9VqDp9TIpKS8NbxEqMTK0aUWoH+QTXgKrRBPBiTe3peJbJaVL0Zk+Uyyz0guLic1nAL5G4CCw7FmN/z7GJ49LrQUJGtbo5pCYP/M3ONVgkHS2wjTdKVwc/kzd6htcuIgPNk9GHI0PxRNjpV9fBJzY8cGjsI43qZIdgH4QL4MEV1hjM98XrzVFz/IjOPS36RvUkJhyZc8HVLbYfq6sE93OzXb+QRym/HeTNU5TOqe02MFa/JqpqmdJcYIXicpr4dSWcWXofy7496f4b4QEWMMcw36hLFp06+41JlmhDVJTDXMLgbNrsAynm5bjZhNw3RxhYrkPkGhBCa62xnqISFTOLEDJ8MsMAWPJLmbKOYBmHbxJ0ALUwNmbpMA7jL9N1qyfquxUfF0DBhLHVjkKHZUYpVkouop4hT9uQeoFm7q7nyXVZ+yWJyFkzn5aoUM/dE7NQX8D8dpe6YHWpcR2+cMmyM=";
+    </script>
+    
+    <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+    
