@@ -2038,14 +2038,34 @@
 
         function uploadProof(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 画像データを要素に保存
+                    event.target.setAttribute('data-image-data', e.target.result);
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('proofPreview').src = e.target.result;
-                document.getElementById('proofPreview').style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+                    // プレビューを表示
+                    const preview = document.getElementById('proofPreview') || document.createElement('div');
+                    preview.id = 'proofPreview';
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+                        <p>画像が正常にアップロードされました</p>
+                    `;
+
+                    if (!document.getElementById('proofPreview')) {
+                        event.target.parentNode.appendChild(preview);
+                    }
+
+                    // 申請ボタンを有効化
+                    const applyBtn = document.querySelector('.btn-primary[onclick*="applyForPurchase"]');
+                    if (applyBtn) {
+                        applyBtn.disabled = false;
+                        applyBtn.style.opacity = '1';
+                        applyBtn.style.cursor = 'pointer';
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         function submitPurchase() {
@@ -2764,6 +2784,187 @@
             }
         };
 
+    
+        // メモ項目名を更新する関数
+        function updateMemoLabel() {
+            const newLabel = document.getElementById('memoLabelSetting').value;
+            const memoLabel = document.getElementById('memoLabel');
+            if (memoLabel) {
+                memoLabel.textContent = newLabel + ':';
+            }
+            // LocalStorageに保存
+            localStorage.setItem('memoLabelText', newLabel);
+        }
+
+        // applyForPurchase関数を修正してメモを含める
+        function applyForPurchaseWithMemo() {
+            const memo = document.getElementById('purchaseMemo')?.value || '';
+            const originalApply = window.applyForPurchase;
+            if (originalApply) {
+                // メモ情報を追加してオリジナル関数を実行
+                const existingRequests = JSON.parse(localStorage.getItem('purchaseRequests') || '[]');
+                // 最新のリクエストにメモを追加
+                if (existingRequests.length > 0) {
+                    existingRequests[existingRequests.length - 1].memo = memo;
+                    localStorage.setItem('purchaseRequests', JSON.stringify(existingRequests));
+                }
+            }
+        }
+    
+        // LocalStorage永続化機能の強化
+        function saveAllSettings() {
+            // 決済設定を保存
+            const paymentSettings = {
+                paypayEnabled: document.getElementById('paypayEnabled')?.checked || false,
+                paypayAccount: document.getElementById('paypayAccount')?.value || '',
+                cryptoEnabled: document.getElementById('cryptoEnabled')?.checked || false,
+                cryptoAddress: document.getElementById('cryptoAddress')?.value || ''
+            };
+            localStorage.setItem('paymentSettings', JSON.stringify(paymentSettings));
+
+            // 通知設定を保存
+            const notificationSettings = {
+                telegramEnabled: document.getElementById('telegramEnabled')?.checked || false,
+                telegramToken: document.getElementById('telegramToken')?.value || '',
+                telegramChatId: document.getElementById('telegramChatId')?.value || '',
+                telegramThreadId: document.getElementById('telegramThreadId')?.value || '',
+                emailEnabled: document.getElementById('emailEnabled')?.checked || false,
+                emailAddress: document.getElementById('emailAddress')?.value || ''
+            };
+            localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
+
+            // ユーザー情報を保存
+            const userInfo = {
+                currentUser: document.getElementById('currentUser')?.textContent || '',
+                userRole: localStorage.getItem('userRole') || 'user',
+                memoLabelText: document.getElementById('memoLabelSetting')?.value || 'メモ（任意）'
+            };
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        }
+
+        // LocalStorageから設定を復元
+        function loadAllSettings() {
+            try {
+                // 決済設定を復元
+                const paymentSettings = JSON.parse(localStorage.getItem('paymentSettings') || '{}');
+                if (document.getElementById('paypayEnabled')) {
+                    document.getElementById('paypayEnabled').checked = paymentSettings.paypayEnabled || false;
+                }
+                if (document.getElementById('paypayAccount')) {
+                    document.getElementById('paypayAccount').value = paymentSettings.paypayAccount || '';
+                }
+                if (document.getElementById('cryptoEnabled')) {
+                    document.getElementById('cryptoEnabled').checked = paymentSettings.cryptoEnabled || false;
+                }
+                if (document.getElementById('cryptoAddress')) {
+                    document.getElementById('cryptoAddress').value = paymentSettings.cryptoAddress || '';
+                }
+
+                // 通知設定を復元
+                const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+                if (document.getElementById('telegramEnabled')) {
+                    document.getElementById('telegramEnabled').checked = notificationSettings.telegramEnabled || false;
+                }
+                if (document.getElementById('telegramToken')) {
+                    document.getElementById('telegramToken').value = notificationSettings.telegramToken || '';
+                }
+                if (document.getElementById('telegramChatId')) {
+                    document.getElementById('telegramChatId').value = notificationSettings.telegramChatId || '';
+                }
+                if (document.getElementById('telegramThreadId')) {
+                    document.getElementById('telegramThreadId').value = notificationSettings.telegramThreadId || '';
+                }
+                if (document.getElementById('emailEnabled')) {
+                    document.getElementById('emailEnabled').checked = notificationSettings.emailEnabled || false;
+                }
+                if (document.getElementById('emailAddress')) {
+                    document.getElementById('emailAddress').value = notificationSettings.emailAddress || '';
+                }
+
+                // ユーザー情報を復元
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                if (document.getElementById('memoLabelSetting')) {
+                    document.getElementById('memoLabelSetting').value = userInfo.memoLabelText || 'メモ（任意）';
+                    updateMemoLabel(); // メモラベルを更新
+                }
+
+            } catch (error) {
+                console.log('設定の読み込みでエラーが発生しました:', error);
+            }
+        }
+
+        // 自動保存機能を追加（フォーム要素の変更時に自動保存）
+        function setupAutoSave() {
+            const formElements = document.querySelectorAll('input, select, textarea');
+            formElements.forEach(element => {
+                element.addEventListener('change', saveAllSettings);
+                element.addEventListener('blur', saveAllSettings);
+            });
+        }
+
+        // ページ読み込み時とbeforeunload時に設定を保存/読み込み
+        window.addEventListener('DOMContentLoaded', function() {
+            loadAllSettings();
+            setupAutoSave();
+        });
+
+        window.addEventListener('beforeunload', function() {
+            saveAllSettings();
+        });
+
+        // 定期的に保存（30秒間隔）
+        setInterval(saveAllSettings, 30000);
+    
+        // Telegramテスト送信機能
+        function testTelegramNotification() {
+            const token = document.getElementById('telegramToken').value;
+            const chatId = document.getElementById('telegramChatId').value;
+            const threadId = document.getElementById('telegramThreadId').value;
+
+            if (!token || !chatId) {
+                alert('TelegramのトークンとチャットIDが必要です。');
+                return;
+            }
+
+            // テストメッセージを作成
+            const testMessage = `🔧 ポイント交換プラットフォーム\n\n接続テストメッセージです。\n\n⏰ 送信時刻: ${new Date().toLocaleString('ja-JP')}\n✅ 接続が正常に動作しています。`;
+
+            // Telegram API URL
+            let apiUrl = `https://api.telegram.org/bot${token}/sendMessage`;
+
+            // メッセージのパラメータ
+            const params = {
+                chat_id: chatId,
+                text: testMessage,
+                parse_mode: 'HTML'
+            };
+
+            // スレッドIDがある場合は追加
+            if (threadId && threadId.trim() !== '') {
+                params.message_thread_id = threadId.trim();
+            }
+
+            //送信実行
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(params)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    alert('✅ テストメッセージの送信に成功しました！\n\nTelegramを確認してください。');
+                } else {
+                    alert(`❌ テストメッセージの送信に失敗しました。\n\nエラー: ${data.description || 'Unknown error'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Telegram API Error:', error);
+                alert('❌ ネットワークエラーまたはAPI接続エラーが発生しました。\n\n設定を確認してください。');
+            });
+        }
     </script>
 </body>
 </html>
