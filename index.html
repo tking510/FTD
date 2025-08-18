@@ -94,7 +94,7 @@
             <i class="fas fa-bell mr-3"></i>通知設定
           </button>
           <!-- 同期設定UIは隠す（埋め込みで固定運用） -->
-          <button onclick="showTab('sync')" style="display:none" class="tab-button w-full text-left py-3 px-4 mb-2 rounded-lg tab-inactive">
+          <button onclick="showTab('sync')" class="tab-button w-full text-left py-3 px-4 mb-2 rounded-lg tab-inactive">
             <i class="fas fa-sync-alt mr-3"></i>同期設定
           </button>
         </div>
@@ -314,7 +314,26 @@
               </div>
             </div>
           </div>
+        
+        <!-- 同期設定 -->
+        <div id="sync" class="tab-content hidden">
+          <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-bold mb-6">同期設定（GitHub共有）</h2>
+            <p class="text-sm text-gray-600 mb-4">
+              この画面はテスト用の簡易同期UIです。ボタンを押すと、
+              共有JSON（<code id="syncPathLabel"></code>）を<strong>読み込み</strong> / <strong>保存</strong>できます。
+            </p>
+            <div class="flex gap-3 flex-wrap">
+              <button onclick="manualPullSharedData()" class="bg-gray-700 text-white px-5 py-2 rounded">今すぐ読み込む</button>
+              <button onclick="manualPushSharedData()" class="bg-blue-600 text-white px-5 py-2 rounded">今すぐ保存する</button>
+            </div>
+            <div class="mt-4 text-sm text-gray-600">
+              <div>レポジトリ: <code id="syncRepoLabel"></code></div>
+              <div>ブランチ: <code id="syncBranchLabel"></code></div>
+            </div>
+          </div>
         </div>
+</div>
 
         <!-- 通知設定 -->
         <div id="notifications" class="tab-content hidden">
@@ -646,6 +665,14 @@
     function loadSyncSettings() {
       try { localStorage.setItem('syncSettings', JSON.stringify(SYNC_AUTO)); } catch(e){}
       syncSettings = { ...SYNC_AUTO };
+      try {
+        const repoLabel = document.getElementById('syncRepoLabel');
+        const branchLabel = document.getElementById('syncBranchLabel');
+        const pathLabel = document.getElementById('syncPathLabel');
+        if (repoLabel) repoLabel.textContent = syncSettings.owner + '/' + syncSettings.repo;
+        if (branchLabel) branchLabel.textContent = syncSettings.branch;
+        if (pathLabel) pathLabel.textContent = syncSettings.filePath;
+      } catch(e) {}
       // UIがあれば反映
       const map = {syncEnabled:'enabled', syncOwner:'owner', syncRepo:'repo', syncBranch:'branch', syncFilePath:'filePath', syncToken:'token'};
       Object.entries(map).forEach(([id,key])=>{
@@ -684,7 +711,9 @@
     }
     async function fetchSharedData() {
       const p = encodeURIComponent(syncSettings.filePath).replace(/%2F/g,'/');
-      const j = await githubApi('GET', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${p}?ref=${encodeURIComponent(syncSettings.branch)}`);
+      let j;
+      try {
+        j = await githubApi('GET', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${p}?ref=${encodeURIComponent(syncSettings.branch)}`);
       _sharedSha = j.sha;
       const content = atob(j.content.replace(/\n/g,''));
       const data = JSON.parse(content || '{}');
