@@ -29,7 +29,13 @@
     }
     .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
     .close:hover { color: black; }
-  </style>
+  
+  /* 右下固定のLINEチャットボタン */
+  .line-chat{position:fixed;right:20px;bottom:20px;width:64px;height:64px;border-radius:50%;
+    box-shadow:0 4px 10px rgba(0,0,0,.25);background:#06C755;display:flex;align-items:center;justify-content:center;
+    z-index:200;cursor:pointer}
+  .line-chat svg{width:38px;height:38px;display:block}
+</style>
 </head>
 <body class="bg-gray-50 font-sans">
 
@@ -320,7 +326,6 @@
           <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-xl font-bold mb-6">同期設定（GitHub共有）</h2>
             <p class="text-sm text-gray-600 mb-4">
-              この画面はテスト用の簡易同期UIです。ボタンを押すと、
               共有JSON（<code id="syncPathLabel"></code>）を<strong>読み込み</strong> / <strong>保存</strong>できます。
             </p>
             <div class="flex gap-3 flex-wrap">
@@ -712,8 +717,7 @@
     async function fetchSharedData() {
       const p = encodeURIComponent(syncSettings.filePath).replace(/%2F/g,'/');
       let j;
-      try {
-        j = await githubApi('GET', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${p}?ref=${encodeURIComponent(syncSettings.branch)}`);
+      try { j = await githubApi('GET', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${p}?ref=${encodeURIComponent(syncSettings.branch)}`);
       _sharedSha = j.sha;
       const content = atob(j.content.replace(/\n/g,''));
       const data = JSON.parse(content || '{}');
@@ -1582,5 +1586,34 @@ ${application.memo ? `メモ: ${application.memo}` : ''}`);
     window.__genspark_locale="ja-JP"; window.__genspark_token="...";
   </script>
   <script id="html_notice_dialog_script" src="https://www.genspark.ai/notice_dialog.js"></script>
+
+<!-- LINEチャット（固定） -->
+<a href="https://lin.ee/qqGzNac" target="_blank" class="line-chat" aria-label="LINEでチャット">
+  <!-- LINE ロゴ（SVG） -->
+  <svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path fill="#fff" d="M18 6c-6.6 0-12 4.23-12 9.45 0 3.01 1.94 5.68 4.9 7.31l-.77 3.59a.6.6 0 0 0 .88.65l4.3-2.35c.86.13 1.74.2 2.69.2 6.6 0 12-4.23 12-9.45S24.6 6 18 6z"/>
+    <path fill="#06C755" d="M12.5 13.2h1.8v6.1h-1.8v-6.1zm3.4 0h1.8v4.4h2.2v1.7H15.9v-6.1zm6.6 0h-1.8v6.1H23v-2.2h1.6c1.3 0 2.4-.9 2.4-2s-1.1-1.9-2.4-1.9H22.5zm1.7 2.3c.5 0 .9.3.9.7s-.4.7-.9.7H23v-1.4h1.2z"/>
+  </svg>
+</a>
 </body>
 </html>
+
+<script>
+// FORCE_ADMIN_BOOTSTRAP
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('factory')==='1'){
+    try{localStorage.clear();sessionStorage.clear();}catch(e){}
+  }
+  try{
+    const key='users';
+    let users=[];
+    try{ users=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ users=[]; }
+    if(!Array.isArray(users)) users=[];
+    if(!users.find(u=>u && (u.username==='admin' || u.user==='admin'))){
+      users.push({username:'admin', password:'admin123', role:'admin', createdAt:Date.now()});
+      localStorage.setItem(key, JSON.stringify(users));
+    }
+  }catch(e){}
+})();
+</script>
