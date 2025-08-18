@@ -68,10 +68,9 @@
 
   <script>
 // --- ログイン処理（この関数だけ差し替え/追加してください） ---
-function login(e){
-  if (e && e.preventDefault) e.preventDefault();
+function login(event) {
+  if (event && event.preventDefault) event.preventDefault();
 
-  // 入力値（あなたのID名に合わせています）
   const u = (document.getElementById('loginUsername')?.value || '').trim();
   const p = (document.getElementById('loginPassword')?.value || '').trim();
 
@@ -79,6 +78,58 @@ function login(e){
     alert('ユーザー名とパスワードを入力してください');
     return;
   }
+
+  // 共有データ(users) + ローカル(users)をマージ
+  let allUsers = [];
+  try {
+    if (Array.isArray(window.users)) allUsers = [...window.users];
+  } catch (_) {}
+  try {
+    const localUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    if (Array.isArray(localUsers)) {
+      localUsers.forEach(xx => {
+        if (xx && !allUsers.find(x => x && x.username === xx.username)) allUsers.push(xx);
+      });
+    }
+  } catch (_) {}
+
+  // 照合（ユーザー名 or 電話番号）
+  let user = allUsers.find(x => x && (x.username === u || x.phone === u) && x.password === p);
+
+  // フォールバック：admin/admin123 は常に通す
+  if (!user && u === 'admin' && p === 'admin123') {
+    user = { username: 'admin', password: 'admin123', role: 'admin', createdAt: new Date().toISOString() };
+    // ローカルにも格納しておく
+    try {
+      const raw = localStorage.getItem('users') || '[]';
+      const arr = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+      if (!arr.find(x => x && x.username === 'admin')) {
+        arr.push(user);
+        localStorage.setItem('users', JSON.stringify(arr));
+      }
+    } catch (_) {}
+  }
+
+  if (!user) {
+    alert('ユーザー名またはパスワードが違います');
+    return;
+  }
+
+  // セッション確立
+  window.currentUser = user;
+  window.currentRole = user.role || 'user';
+  try { localStorage.setItem('currentUser', JSON.stringify(window.currentUser)); } catch (_) {}
+
+  // 画面遷移
+  if (window.currentRole === 'admin' && typeof showAdminScreen === 'function') {
+    showAdminScreen();
+  } else if (typeof showUserScreen === 'function') {
+    showUserScreen();
+  } else if (typeof showAdminScreen === 'function') {
+    // 最低限どちらかに進む
+    showAdminScreen();
+  }
+}
 
   // 1) ローカル保存ユーザー一覧
   let localUsers = [];
