@@ -110,6 +110,9 @@
                     <button onclick="showTab('notifications')" class="tab-button w-full text-left py-3 px-4 mb-2 rounded-lg tab-inactive">
                         <i class="fas fa-bell mr-3"></i>通知設定
                     </button>
+                    <button onclick="showTab('sync')" class="tab-button w-full text-left py-3 px-4 mb-2 rounded-lg tab-inactive">
+                        <i class="fas fa-sync-alt mr-3"></i>同期設定
+                    </button>
                 </div>
             </div>
 
@@ -415,7 +418,51 @@
                             <i class="fas fa-save mr-2"></i>通知設定を保存
                         </button>
                     </div>
-                </div>
+                
+<!-- 同期設定タブ -->
+<div id="sync" class="tab-content hidden">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-6">GitHub 同期設定（共有データ）</h2>
+        <p class="text-sm text-gray-600 mb-4">ここで設定したGitHubリポジトリのJSONに、ユーザー/申請/決済設定/通知設定/出金先を保存・読み込みします。他の人とデータを共有できます。</p>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">有効化</label>
+                <select id="syncEnabled" class="w-full p-3 border border-gray-300 rounded-lg">
+                    <option value="false">無効</option>
+                    <option value="true">有効</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ブランチ</label>
+                <input type="text" id="syncBranch" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: main">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">オーナー</label>
+                <input type="text" id="syncOwner" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ユーザー名またはOrg名">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">リポジトリ名</label>
+                <input type="text" id="syncRepo" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: point-platform-data">
+            </div>
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">ファイルパス（JSON）</label>
+                <input type="text" id="syncFilePath" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: data/shared.json">
+            </div>
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Personal Access Token（repoスコープ）</label>
+                <input type="password" id="syncToken" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ghp_xxxxxxxxx">
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveSyncSettings()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"><i class="fas fa-save mr-2"></i>設定を保存</button>
+            <button onclick="manualPullSharedData()" class="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800"><i class="fas fa-download mr-2"></i>共有データ読込</button>
+            <button onclick="manualPushSharedData()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"><i class="fas fa-upload mr-2"></i>共有データ保存</button>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">※Tokenはブラウザに保存されます。公開環境では注意してください。</p>
+    </div>
+</div>
+
+</div>
             </div>
         </div>
     </div>
@@ -671,7 +718,51 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
+                
+<!-- 同期設定タブ -->
+<div id="sync" class="tab-content hidden">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-bold mb-6">GitHub 同期設定（共有データ）</h2>
+        <p class="text-sm text-gray-600 mb-4">ここで設定したGitHubリポジトリのJSONに、ユーザー/申請/決済設定/通知設定/出金先を保存・読み込みします。他の人とデータを共有できます。</p>
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">有効化</label>
+                <select id="syncEnabled" class="w-full p-3 border border-gray-300 rounded-lg">
+                    <option value="false">無効</option>
+                    <option value="true">有効</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">ブランチ</label>
+                <input type="text" id="syncBranch" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: main">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">オーナー</label>
+                <input type="text" id="syncOwner" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ユーザー名またはOrg名">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">リポジトリ名</label>
+                <input type="text" id="syncRepo" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: point-platform-data">
+            </div>
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">ファイルパス（JSON）</label>
+                <input type="text" id="syncFilePath" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="例: data/shared.json">
+            </div>
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Personal Access Token（repoスコープ）</label>
+                <input type="password" id="syncToken" class="w-full p-3 border border-gray-300 rounded-lg" placeholder="ghp_xxxxxxxxx">
+            </div>
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveSyncSettings()" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600"><i class="fas fa-save mr-2"></i>設定を保存</button>
+            <button onclick="manualPullSharedData()" class="bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800"><i class="fas fa-download mr-2"></i>共有データ読込</button>
+            <button onclick="manualPushSharedData()" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700"><i class="fas fa-upload mr-2"></i>共有データ保存</button>
+        </div>
+        <p class="text-xs text-gray-500 mt-4">※Tokenはブラウザに保存されます。公開環境では注意してください。</p>
+    </div>
+</div>
+
+</div>
             </div>
         </div>
     </div>
@@ -693,21 +784,137 @@
             cashout: { token: '', chatId: '', threadId: '' }
         };
         let userWithdrawals = {};
+        let syncSettings = { enabled: false };
+        let _sharedSha = null;
         let currentPurchaseId = null;
+
+        
+// 同期設定の保存/読込
+function loadSyncSettings() {
+    try {
+        const s = JSON.parse(localStorage.getItem('syncSettings') || '{"enabled":false}');
+        syncSettings = s;
+        // 画面に反映（存在すれば）
+        const ids = ['syncEnabled','syncOwner','syncRepo','syncBranch','syncFilePath','syncToken'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                if (id === 'syncEnabled') el.value = String(!!s.enabled);
+                else el.value = s[id.replace('sync','').replace(/^([A-Z])/, lambda=>lambda.toLowerCase())] || s[id] || s[id[0].lowercase];
+            }
+        });
+    } catch(e) {}
+}
+function saveSyncSettings() {
+    const s = {
+        enabled: document.getElementById('syncEnabled').value === 'true',
+        owner: document.getElementById('syncOwner').value.trim(),
+        repo: document.getElementById('syncRepo').value.trim(),
+        branch: document.getElementById('syncBranch').value.trim() || 'main',
+        filePath: document.getElementById('syncFilePath').value.trim() || 'data/shared.json',
+        token: document.getElementById('syncToken').value.trim()
+    };
+    localStorage.setItem('syncSettings', JSON.stringify(s));
+    syncSettings = s;
+    alert('同期設定を保存しました');
+}
+
+async function githubApi(method, path, bodyJson=None) {
+    if (!syncSettings.token) throw new Error('Token未設定');
+    const res = await fetch(`https://api.github.com${path}`, {
+        method,
+        headers: {
+            'Authorization': `token ${syncSettings.token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+        },
+        body: bodyJson ? JSON.stringify(bodyJson) : undefined
+    });
+    if (!res.ok) {
+        const t = await res.text();
+        throw new Error(`GitHub API ${method} ${path} failed: ${res.status} ${t}`);
+    }
+    return res.json();
+}
+
+async function fetchSharedData() {
+    // GET /repos/{owner}/{repo}/contents/{path}?ref=branch
+    const encPath = encodeURIComponent(syncSettings.filePath).replace('%2F','/');
+    const json = await githubApi('GET', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${encPath}?ref=${encodeURIComponent(syncSettings.branch)}`);
+    _sharedSha = json.sha;
+    const content = atob(json.content.replace(/\n/g,''));
+    const data = JSON.parse(content || '{}');
+    // 反映（存在すれば上書き）
+    users = data.users || users;
+    applications = data.applications || applications;
+    paymentMethods = data.paymentMethods || paymentMethods;
+    notificationSettings = data.notificationSettings || notificationSettings;
+    userWithdrawals = data.userWithdrawals || userWithdrawals;
+}
+
+async function pushSharedData(message='Update shared data') {
+    const payload = {
+        users, applications, paymentMethods, notificationSettings, userWithdrawals
+    };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+    const encPath = encodeURIComponent(syncSettings.filePath).replace('%2F','/');
+    const body = {
+        message,
+        content,
+        branch: syncSettings.branch
+    };
+    if (_sharedSha) body.sha = _sharedSha;
+    // PUT /repos/{owner}/{repo}/contents/{path}
+    const res = await githubApi('PUT', `/repos/${syncSettings.owner}/${syncSettings.repo}/contents/${encPath}`, body);
+    _sharedSha = res.content && res.content.sha || _sharedSha;
+}
+
+async function manualPullSharedData() {
+    try {
+        await fetchSharedData();
+        saveData(true); // cache locally without pushing
+        loadApplicationsTable();
+        loadUsersTable();
+        loadPaymentSettings();
+        loadTelegramSettings();
+            loadSyncSettings();
+        alert('共有データを読み込みました');
+    } catch(e) {
+        alert('読込失敗: ' + e.message);
+    }
+}
+async function manualPushSharedData() {
+    try {
+        await pushSharedData('Manual save from app');
+        alert('共有データを保存しました');
+    } catch(e) {
+        alert('保存失敗: ' + e.message);
+    }
+}
 
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initializeScreen();
+            (async ()=>{ await loadData(); initializeScreen(); })();
         });
 
         // データ読み込み
-        function loadData() {
+        async async function loadData() {
             users = JSON.parse(localStorage.getItem('users') || '[]');
             applications = JSON.parse(localStorage.getItem('applications') || '[]');
             paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '{"paypay":{"id":"","url":"","qr":""},"crypto":[],"bank":{"personal":{},"corporate":{}},"convenience":[]}');
             notificationSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{"purchase":{"token":"","chatId":"","threadId":""},"cashout":{"token":"","chatId":"","threadId":""}}');
             userWithdrawals = JSON.parse(localStorage.getItem('userWithdrawals') || '{}');
+
+// 同期設定読込
+loadSyncSettings();
+if (syncSettings.enabled && syncSettings.owner && syncSettings.repo && syncSettings.token) {
+    try {
+        await fetchSharedData();
+    } catch(e) {
+        console.warn('共有データ読込失敗:', e.message);
+    }
+}
+
             
             // 管理者ユーザーが存在しない場合は作成
             if (!users.find(u => u.username === 'admin')) {
@@ -722,12 +929,16 @@
         }
 
         // データ保存
-        function saveData() {
+        function saveData(skipPush) {
             localStorage.setItem('users', JSON.stringify(users));
             localStorage.setItem('applications', JSON.stringify(applications));
             localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
             localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
             localStorage.setItem('userWithdrawals', JSON.stringify(userWithdrawals));
+            if (syncSettings && syncSettings.enabled && !skipPush) {
+                // ベストエフォートで保存
+                pushSharedData().catch(e => console.warn('共有保存失敗:', e.message));
+            }
         }
 
         // 画面初期化
@@ -785,6 +996,7 @@
             loadUsersTable();
             loadPaymentSettings();
             loadTelegramSettings();
+            loadSyncSettings();
         }
 
         // ユーザー画面表示
@@ -824,6 +1036,7 @@
                 loadPaymentSettings();
             } else if (tabName === 'notifications') {
                 loadTelegramSettings();
+            loadSyncSettings();
             }
         }
 
