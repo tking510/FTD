@@ -66,6 +66,74 @@
     </div>
   </div>
 
+  <script>
+// --- ログイン処理（この関数だけ差し替え/追加してください） ---
+function login(e){
+  if (e && e.preventDefault) e.preventDefault();
+
+  // 入力値（あなたのID名に合わせています）
+  const u = (document.getElementById('loginUsername')?.value || '').trim();
+  const p = (document.getElementById('loginPassword')?.value || '').trim();
+
+  if (!u || !p) {
+    alert('ユーザー名とパスワードを入力してください');
+    return;
+  }
+
+  // 1) ローカル保存ユーザー一覧
+  let localUsers = [];
+  try {
+    const raw = localStorage.getItem('users') || '[]';
+    localUsers = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
+  } catch (_) { localUsers = []; }
+
+  // 2) 共有（GitHub）読込済みのユーザー一覧（存在すれば）
+  let sharedUsers = [];
+  try {
+    if (window.sharedData && Array.isArray(window.sharedData.users)) {
+      sharedUsers = window.sharedData.users;
+    }
+  } catch (_) {}
+
+  // 結合（同名は後勝ち）
+  const allMap = new Map();
+  [...localUsers, ...sharedUsers].forEach(x => { if (x && x.username) allMap.set(x.username, x); });
+  const allUsers = Array.from(allMap.values());
+
+  // 3) 照合
+  let user = allUsers.find(x => x && x.username === u && x.password === p);
+
+  // 4) フォールバック：admin/admin123 は常に通す
+  if (!user && u === 'admin' && p === 'admin123') {
+    user = { username:'admin', password:'admin123', role:'admin', createdAt: Date.now() };
+    // ローカルにも確実に保持
+    if (!localUsers.find(x => x && x.username === 'admin')) {
+      localUsers.push(user);
+      localStorage.setItem('users', JSON.stringify(localUsers));
+    }
+  }
+
+  if (!user) {
+    alert('ユーザー名またはパスワードが違います');
+    return;
+  }
+
+  // 5) セッション確立
+  const sess = { username: user.username, role: user.role || 'user' };
+  localStorage.setItem('currentUser', JSON.stringify(sess));
+  window.currentUser = sess;
+
+  // 6) 画面遷移（あなたの関数名に合わせています）
+  if (typeof showAdminScreen === 'function') {
+    showAdminScreen();
+  } else {
+    document.addEventListener('readystatechange', function(){
+      if (typeof showAdminScreen === 'function') showAdminScreen();
+    });
+  }
+}
+</script>
+
   <!-- 管理画面 -->
   <div id="adminScreen" class="hidden">
     <!-- ヘッダー -->
