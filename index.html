@@ -892,12 +892,20 @@ function __matchCredentials(uin, pin) {
 
         // データ保存
         function saveData() {
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('applications', JSON.stringify(applications));
-            localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
-            localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
-            localStorage.setItem('userWithdrawals', JSON.stringify(userWithdrawals));
+    try {
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('applications', JSON.stringify(applications));
+        localStorage.setItem('paymentMethods', JSON.stringify(paymentMethods));
+        localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
+        localStorage.setItem('userWithdrawals', JSON.stringify(userWithdrawals));
+    } catch(e) { console.warn('local save error', e); }
+    // 自動同期（非同期・失敗は無視）
+    try {
+        if (syncSettings && syncSettings.enabled) {
+            setTimeout(()=>{ pushSharedData('Auto save'); }, 0);
         }
+    } catch(e) { console.warn('auto sync error', e); }
+}
 
         // 画面初期化
         function initializeScreen() {
@@ -1589,18 +1597,15 @@ function __matchCredentials(uin, pin) {
                         methodSelect.appendChild(option);
                     });
                 } else if (genre === 'bank') {
-                    if (paymentMethods.bank.personal && paymentMethods.bank.personal.bankName) {
-                        const option = document.createElement('option');
-                        option.value = 'personal';
-                        option.textContent = '個人銀行';
-                        methodSelect.appendChild(option);
-                    }
-                    if (paymentMethods.bank.corporate && paymentMethods.bank.corporate.bankName) {
-                        const option = document.createElement('option');
-                        option.value = 'corporate';
-                        option.textContent = '法人銀行';
-                        methodSelect.appendChild(option);
-                    }
+                    // 口座情報が未設定でも詳細選択を出す（個人/法人）
+                    (function(){
+                        const p = document.createElement('option');
+                        p.value = 'personal'; p.textContent = '個人銀行';
+                        methodSelect.appendChild(p);
+                        const c = document.createElement('option');
+                        c.value = 'corporate'; c.textContent = '法人銀行';
+                        methodSelect.appendChild(c);
+                    })();
                 } else if (genre === 'convenience') {
                     paymentMethods.convenience.forEach(convenience => {
                         if (convenience.visible !== false) {
@@ -1712,6 +1717,8 @@ function __matchCredentials(uin, pin) {
                             </div>
                         </div>
                     </div>`;
+                } else {
+                    html += `<p class="text-red-600">この口座の詳細がまだ設定されていません。管理画面「決済設定 > 銀行設定」で登録してください。</p>`;
                 }
             } else if (genre === 'convenience') {
                 const convenience = paymentMethods.convenience.find(c => c.name === method);
